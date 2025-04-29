@@ -38,13 +38,14 @@ import {
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import axios from 'axios';
+import { useApi } from '../../contexts/ApiContext';
 import { formatCurrency, formatHours, formatDate } from '../../utils/formatters';
 
 const PayslipDraftDetail = () => {
   const { draftId } = useParams();
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { currentUser } = useAuth();
+  const api = useApi();
   
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -69,30 +70,22 @@ const PayslipDraftDetail = () => {
     setLoading(true);
     try {
       // Get draft details
-      const draftResponse = await axios.get(`/api/payroll/drafts/${draftId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const draftResponse = await api.get(`/api/payroll/drafts/${draftId}`);
       
       setDraft(draftResponse.data);
       
       // Get employee details
-      const employeeResponse = await axios.get(`/api/employees/${draftResponse.data.employee_id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const employeeResponse = await api.get(`/api/employees/${draftResponse.data.employee_id}`);
       
       setEmployee(employeeResponse.data);
       
       // Get client details
-      const clientResponse = await axios.get(`/api/clients/${draftResponse.data.client_id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const clientResponse = await api.get(`/api/clients/${draftResponse.data.client_id}`);
       
       setClient(clientResponse.data);
       
       // Get rates details
-      const ratesResponse = await axios.get(`/api/payroll/rates/${draftResponse.data.payslip_rates_id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const ratesResponse = await api.get(`/api/payroll/rates/${draftResponse.data.payslip_rates_id}`);
       
       setRates(ratesResponse.data);
       
@@ -102,9 +95,7 @@ const PayslipDraftDetail = () => {
         
         if (beneficiaryIds.length > 0) {
           const beneficiariesPromises = beneficiaryIds.map(id => 
-            axios.get(`/api/beneficiaries/${id}`, {
-              headers: { Authorization: `Bearer ${token}` }
-            })
+            api.get(`/api/beneficiaries/${id}`)
           );
           
           const beneficiariesResponses = await Promise.all(beneficiariesPromises);
@@ -195,10 +186,9 @@ const PayslipDraftDetail = () => {
     try {
       const updatedValues = calculateUpdatedNetpay();
       
-      await axios.put(
+      await api.put(
         `/api/payroll/drafts/${draftId}`,
-        updatedValues,
-        { headers: { Authorization: `Bearer ${token}` } }
+        updatedValues
       );
       
       setSuccessMessage('Payslip draft updated successfully');
@@ -218,10 +208,9 @@ const PayslipDraftDetail = () => {
     setSaving(true);
     
     try {
-      await axios.post(
+      await api.post(
         '/api/payroll/finalize',
-        { drafts: [draftId] },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { drafts: [draftId] }
       );
       
       setSuccessMessage('Payslip finalized successfully');

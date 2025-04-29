@@ -13,12 +13,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowBack as ArrowBackIcon, Edit as EditIcon } from '@mui/icons-material';
 import axios from 'axios';
 import EmployeeForm from '../components/employees/EmployeeForm';
-
+import { useApi } from '../contexts/ApiContext';
 const ViewEmployeePage = () => {
   const [employee, setEmployee] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
+  const api = useApi();
   const navigate = useNavigate();
   const { id } = useParams();
   
@@ -29,7 +29,7 @@ const ViewEmployeePage = () => {
         setLoading(true);
         setError('');
         
-        const response = await axios.get(`/api/employees/${id}`);
+        const response = await api.get(`/api/employees/${id}`);
         
         // Ensure bankAccounts is an array
         const employeeData = {

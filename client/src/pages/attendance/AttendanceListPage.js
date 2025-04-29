@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import { useApi } from '../../contexts/ApiContext';
 import { 
   Box, Typography, Button, TextField, 
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, 
@@ -18,7 +18,8 @@ import AttendanceFilter from '../../components/attendance/AttendanceFilter';
 import { useAuth } from '../../contexts/AuthContext';
 
 const AttendanceListPage = () => {
-  const { token } = useAuth();
+  const { currentUser } = useAuth();
+  const api = useApi();
   const [attendanceGroups, setAttendanceGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -39,12 +40,7 @@ const AttendanceListPage = () => {
   const fetchAttendanceGroups = async () => {
     try {
       setLoading(true);
-      const authAxios = axios.create({
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      const response = await authAxios.get('/api/attendance-groups');
+      const response = await api.get('/api/attendance-groups');
       setAttendanceGroups(response.data);
       setLoading(false);
     } catch (err) {
@@ -56,12 +52,7 @@ const AttendanceListPage = () => {
   // Fetch years for filter
   const fetchYears = async () => {
     try {
-      const authAxios = axios.create({
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      const response = await authAxios.get('/api/attendance-groups/years');
+      const response = await api.get('/api/attendance-groups/years');
       setYears(response.data);
     } catch (err) {
       console.error('Error fetching years:', err);
@@ -76,12 +67,7 @@ const AttendanceListPage = () => {
     }
     
     try {
-      const authAxios = axios.create({
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      const response = await authAxios.get(`/api/attendance-groups/periods/${year}`);
+      const response = await api.get(`/api/attendance-groups/periods/${year}`);
       setPeriods(response.data);
     } catch (err) {
       console.error('Error fetching periods:', err);
@@ -89,11 +75,11 @@ const AttendanceListPage = () => {
   };
   
   useEffect(() => {
-    if (token) {
+    if (currentUser) {
       fetchAttendanceGroups();
       fetchYears();
     }
-  }, [token]);
+  }, [currentUser]);
   
   // Handle filter changes
   const handleFilterChange = (name, value) => {
@@ -124,13 +110,7 @@ const AttendanceListPage = () => {
         params.period = filterParams.period;
       }
       
-      const authAxios = axios.create({
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      
-      const response = await authAxios.get(url, { params });
+      const response = await api.get(url, { params });
       
       setAttendanceGroups(response.data);
       setShowFilter(false);
@@ -171,14 +151,8 @@ const AttendanceListPage = () => {
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete the selected attendance group(s)?')) {
       try {
-        const authAxios = axios.create({
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        
         for (const id of selectedGroups) {
-          await authAxios.delete(`/api/attendance-groups/${id}`);
+          await api.delete(`/api/attendance-groups/${id}`);
         }
         
         fetchAttendanceGroups();

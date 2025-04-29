@@ -1,0 +1,31 @@
+<?php
+
+global $PAYROLL_TABLE_HEADER_TEXT, $PAYROLL_TABLE_BODY_KEY;
+
+use Application\models\PayrollAnalyzer;
+
+$group_id = $_POST['attendance_group'];
+
+$ANALYZER = new PayrollAnalyzer($group_id);
+
+$ANALYZER->init();
+
+$RESULTS = $ANALYZER->computeAll();
+
+$RECORDS = array_map(function ($result, $id) {
+    return array_merge((array) $result, ['id' => $id]);
+}, $RESULTS, array_keys($RESULTS));
+
+echo CreateTableAsOptions([
+    'headerItems' => $PAYROLL_TABLE_HEADER_TEXT,
+    'bodyItems' => $PAYROLL_TABLE_BODY_KEY,
+    'data' => $RECORDS,
+    'idName' => 'id',
+    'noCheckbox' => false,
+    'small' => true,
+    'scrollable' => true,
+    'toggleColumns' => [16, 17, 28, 29, 30, 31],
+    'toggleValue' => true,
+]);
+
+// 

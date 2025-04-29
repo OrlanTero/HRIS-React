@@ -35,11 +35,12 @@ import {
   FilterList as FilterIcon
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
-import axios from 'axios';
+import { useApi } from '../../contexts/ApiContext';
 import PettyCashForm from '../../components/pettyCash/PettyCashForm';
 
 const PettyCashPage = () => {
   const { token } = useAuth();
+  const api = useApi();
   const [loading, setLoading] = useState(true);
   const [transactions, setTransactions] = useState([]);
   const [page, setPage] = useState(0);
@@ -62,11 +63,7 @@ const PettyCashPage = () => {
       setLoading(true);
       setError(null);
 
-      const response = await axios.get('/api/pettyCash', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const response = await api.get('/api/pettyCash');
 
       setTransactions(response.data);
       setLoading(false);
@@ -175,11 +172,7 @@ const PettyCashPage = () => {
   // Handle delete transaction
   const handleDeleteTransaction = async () => {
     try {
-      await axios.delete(`/api/pettyCash/${currentTransactionId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      await api.delete(`/api/pettyCash/${currentTransactionId}`);
       
       handleCloseDeleteDialog();
       setRefreshKey(prev => prev + 1);

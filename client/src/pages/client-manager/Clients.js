@@ -38,13 +38,10 @@ import {
   EventNote as EventNoteIcon
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
-import axios from 'axios';
+import { useApi } from '../../contexts/ApiContext';
 import MainLayout from '../../components/layouts/MainLayout';
 
 // Set the base URL for axios if it's not already set
-if (!axios.defaults.baseURL) {
-  axios.defaults.baseURL = 'http://localhost:5000';
-}
 
 // Tab Panel component
 function TabPanel(props) {
@@ -68,7 +65,8 @@ function TabPanel(props) {
 }
 
 const Clients = () => {
-  const { currentUser, token } = useAuth();
+  const { currentUser } = useAuth();
+  const api = useApi();
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
@@ -127,25 +125,20 @@ const Clients = () => {
   const [loadingHolidays, setLoadingHolidays] = useState(false);
   const [openHolidayDialog, setOpenHolidayDialog] = useState(false);
 
-  // Configure axios with auth header
-  const authAxios = axios.create({
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  });
+  // Fetch clients on component mount
 
   // Fetch clients on component mount
   useEffect(() => {
-    if (token) {
+    if (currentUser) {
       fetchClients();
     }
-  }, [token]);
+  }, [currentUser]);
 
   // Fetch clients from API
   const fetchClients = async () => {
     setLoading(true);
     try {
-      const response = await authAxios.get('/api/clients');
+      const response = await api.get('/api/clients');
       setClients(response.data);
     } catch (error) {
       console.error('Error fetching clients:', error);
@@ -301,11 +294,11 @@ const Clients = () => {
     try {
       if (isEdit) {
         // Update existing client
-        await authAxios.put(`/api/clients/${currentClient.client_id}`, currentClient);
+        await api.put(`/api/clients/${currentClient.client_id}`, currentClient);
         showNotification('Client updated successfully');
       } else {
         // Create new client
-        await authAxios.post('/api/clients', currentClient);
+        await api.post('/api/clients', currentClient);
         showNotification('Client created successfully');
       }
       // Refresh clients list
@@ -322,7 +315,7 @@ const Clients = () => {
   const handleDelete = async (clientId) => {
     if (window.confirm('Are you sure you want to delete this client?')) {
       try {
-        await authAxios.delete(`/api/clients/${clientId}`);
+        await api.delete(`/api/clients/${clientId}`);
         showNotification('Client deleted successfully');
         fetchClients();
       } catch (error) {
@@ -372,7 +365,7 @@ const Clients = () => {
   const fetchClientHolidays = async (clientId) => {
     setLoadingHolidays(true);
     try {
-      const response = await authAxios.get(`/api/client-holidays/client/${clientId}`);
+      const response = await api.get(`/api/client-holidays/client/${clientId}`);
       setClientHolidays(response.data);
     } catch (error) {
       console.error('Error fetching client holidays:', error);
@@ -385,7 +378,7 @@ const Clients = () => {
   // Fetch available holidays
   const fetchAvailableHolidays = async (clientId) => {
     try {
-      const response = await authAxios.get(`/api/client-holidays/available/${clientId}`);
+      const response = await api.get(`/api/client-holidays/available/${clientId}`);
       setAvailableHolidays(response.data);
     } catch (error) {
       console.error('Error fetching available holidays:', error);
@@ -398,7 +391,7 @@ const Clients = () => {
     if (!selectedHoliday || !viewClient) return;
     
     try {
-      await authAxios.post('/api/client-holidays', {
+      await api.post('/api/client-holidays', {
         client_id: viewClient.client_id,
         holiday_id: selectedHoliday
       });
@@ -417,7 +410,7 @@ const Clients = () => {
   const handleRemoveHoliday = async (clientHolidayId) => {
     if (window.confirm('Are you sure you want to remove this holiday?')) {
       try {
-        await authAxios.delete(`/api/client-holidays/${clientHolidayId}`);
+        await api.delete(`/api/client-holidays/${clientHolidayId}`);
         showNotification('Holiday removed successfully');
         if (viewClient) {
           fetchClientHolidays(viewClient.client_id);

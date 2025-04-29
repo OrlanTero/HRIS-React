@@ -13,12 +13,14 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useAuth } from '../contexts/AuthContext';
+import { useApi } from '../contexts/ApiContext';
 import LoanPaymentForm from '../components/loans/LoanPaymentForm';
 import LoanPaymentsList from '../components/loans/LoanPaymentsList';
 import axios from 'axios';
 
 const LoansPage = () => {
   const { token } = useAuth();
+  const api = useApi();
   const [tabValue, setTabValue] = useState(0);
   const [openForm, setOpenForm] = useState(false);
   const [payments, setPayments] = useState([]);
@@ -35,9 +37,7 @@ const LoansPage = () => {
     setError(null);
 
     try {
-      const response = await axios.get('/api/loan-payments', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get('/api/loan-payments');
       setPayments(response.data);
     } catch (err) {
       console.error('Failed to fetch loan payments:', err);

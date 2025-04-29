@@ -29,6 +29,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useApi } from '../contexts/ApiContext';
 
 const StatsCard = ({ icon, title, value, description, color }) => {
   const theme = useTheme();

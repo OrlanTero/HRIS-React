@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ApiProvider } from './contexts/ApiContext';
 import MainLayout from './components/layouts/MainLayout';
 
 // Pages
@@ -51,6 +52,7 @@ import LoanPaymentsPage from './pages/PayrollManager/LoanPaymentsPage';
 // Payroll System Pages
 import PayrollPage from './pages/PayrollManager/PayrollPage';
 import PayslipDraftDetail from './pages/PayrollManager/PayslipDraftDetail';
+import PayslipPrint from './pages/PayrollManager/PayslipPrint';
 
 // Create a theme
 const theme = createTheme({
@@ -159,288 +161,280 @@ const App = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AuthProvider>
-        <Router>
-          <Routes>
-            {/* Login route */}
-            <Route path="/login" element={<LoginPage />} />
-            
-            {/* Dashboard routes */}
-            <Route path="/" element={
-              <ProtectedRoute>
-                <MainLayout>
-                <DashboardPage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <MainLayout>
-                <DashboardPage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            {/* Employee routes */}
-            <Route path="/employees" element={
-              <ProtectedRoute>
-                <MainLayout>
-                <EmployeeListPage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/employees/create" element={
-              <ProtectedRoute>
-                <MainLayout>
-                <CreateEmployeePage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/employees/edit/:id" element={
-              <ProtectedRoute>
-                <MainLayout>
-                <EditEmployeePage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/employees/view/:id" element={
-              <ProtectedRoute>
-                <MainLayout>
-                <ViewEmployeePage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            {/* Personnel Routes */}
-            <Route path="/personnel/employees" element={
-              <ProtectedRoute>
-                <MainLayout>
+        <ApiProvider>
+          <Router>
+            <Routes>
+              {/* Login route */}
+              <Route path="/login" element={<LoginPage />} />
+              
+              {/* Dashboard routes */}
+              <Route path="/" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                  <DashboardPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                  <DashboardPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+              
+              {/* Employee routes */}
+              <Route path="/employees" element={
+                <ProtectedRoute>
+                  <MainLayout>
                   <EmployeeListPage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/personnel/employment" element={
-              <ProtectedRoute>
-                <Employment />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/personnel/banks" element={
-              <ProtectedRoute>
-                <Banks />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/personnel/holidays" element={
-              <ProtectedRoute>
-                <Holidays />
-              </ProtectedRoute>
-            } />
-            
-            {/* Clients Routes */}
-            <Route path="/client-manager/clients" element={
-              <ProtectedRoute>
-                <Clients />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/client-manager/assign" element={
-              <ProtectedRoute>
-                <AssignEmployees />
-              </ProtectedRoute>
-            } />
-            
-            {/* Attendance System Routes */}
-            <Route path="/attendance/new" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <AttendanceFormPage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/attendance/:id/edit" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <AttendanceFormPage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/attendance/:id" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <AttendanceDetailPage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/attendance" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <AttendanceListPage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            {/* Mortuary System Routes - more specific routes first */}
-            <Route path="/mortuaries/create" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <CreateMortuaryPage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/mortuaries/edit/:id" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <EditMortuaryPage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/mortuaries/:mortuaryId/beneficiaries/add" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <AddBeneficiaryPage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/beneficiaries/edit/:id" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <EditBeneficiaryPage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/beneficiaries/:id/payments" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <PaymentPage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/mortuaries/:id" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <MortuaryDetailPage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/mortuaries" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <MortuaryListPage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            {/* Adjustments System Routes */}
-            <Route path="/adjustments/:id/edit" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <EditAdjustmentPage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/adjustments" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <AdjustmentsPage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            {/* Petty Cash Routes */}
-            <Route path="/petty-cash" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <PettyCashPage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/petty-cash/dashboard" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <PettyCashDashboard />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            {/* Requisitions System Routes */}
-            <Route path="/requisitions" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <RequisitionsPage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            {/* Disbursements System Routes */}
-            <Route path="/disbursements" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <DisbursementsPage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            {/* Loan System Routes */}
-            <Route path="/financial/loan-manager" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <LoanManagerPage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/financial/loan-payments" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <LoanPaymentsPage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            {/* Payroll System Routes */}
-            <Route path="/payroll" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <PayrollPage />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/payroll/draft/:draftId" element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <PayslipDraftDetail />
-                </MainLayout>
-              </ProtectedRoute>
-            } />
-            
-            {/* Administrator Routes */}
-            <Route path="/administrator/data-management" element={
-              <ProtectedRoute>
-                <DataManagement />
-              </ProtectedRoute>
-            } />
-            
-            {/* Redirect to dashboard by default */}
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
-        </Router>
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/employees/create" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                  <CreateEmployeePage />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/employees/edit/:id" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                  <EditEmployeePage />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/employees/view/:id" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                  <ViewEmployeePage />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+              
+              {/* Personnel Routes */}
+              <Route path="/personnel/employees" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <EmployeeListPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/personnel/employment" element={
+                <ProtectedRoute>
+                  <Employment />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/personnel/banks" element={
+                <ProtectedRoute>
+                  <Banks />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/personnel/holidays" element={
+                <ProtectedRoute>
+                  <Holidays />
+                </ProtectedRoute>
+              } />
+              
+              {/* Clients Routes */}
+              <Route path="/client-manager/clients" element={
+                <ProtectedRoute>
+                  <Clients />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/client-manager/assign" element={
+                <ProtectedRoute>
+                  <AssignEmployees />
+                </ProtectedRoute>
+              } />
+              
+              {/* Attendance System Routes */}
+              <Route path="/attendance/new" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <AttendanceFormPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/attendance/:id/edit" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <AttendanceFormPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/attendance/:id" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <AttendanceDetailPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/attendance" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <AttendanceListPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+              
+              {/* Mortuary System Routes - more specific routes first */}
+              <Route path="/mortuaries/create" element={
+                <ProtectedRoute>
+                    <CreateMortuaryPage />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/mortuaries/edit/:id" element={
+                <ProtectedRoute>
+                    <EditMortuaryPage />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/mortuaries/:mortuaryId/beneficiaries/add" element={
+                <ProtectedRoute>
+                    <AddBeneficiaryPage />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/beneficiaries/edit/:id" element={
+                <ProtectedRoute>
+                    <EditBeneficiaryPage />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/beneficiaries/:id/payments" element={
+                <ProtectedRoute>
+                    <PaymentPage />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/mortuaries/:id" element={
+                <ProtectedRoute>
+                    <MortuaryDetailPage />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/mortuaries" element={
+                <ProtectedRoute>
+                    <MortuaryListPage />
+                </ProtectedRoute>
+              } />
+              
+              {/* Adjustments System Routes */}
+              <Route path="/adjustments/:id/edit" element={
+                <ProtectedRoute>
+                    <EditAdjustmentPage />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/adjustments" element={
+                <ProtectedRoute>
+                    <AdjustmentsPage />
+                </ProtectedRoute>
+              } />
+              
+              {/* Petty Cash Routes */}
+              <Route path="/petty-cash" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <PettyCashPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/petty-cash/dashboard" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <PettyCashDashboard />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+              
+              {/* Requisitions System Routes */}
+              <Route path="/requisitions" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <RequisitionsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+              
+              {/* Disbursements System Routes */}
+              <Route path="/disbursements" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <DisbursementsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+              
+              {/* Loan System Routes */}
+              <Route path="/financial/loan-manager" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <LoanManagerPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/financial/loan-payments" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <LoanPaymentsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+              
+              {/* Payroll System Routes */}
+              <Route path="/payroll" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <PayrollPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/payroll/draft/:draftId" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <PayslipDraftDetail />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/payroll/print/:draftId" element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <PayslipPrint />
+                  </MainLayout>
+                </ProtectedRoute>
+              } />
+              
+              {/* Administrator Routes */}
+              <Route path="/administrator/data-management" element={
+                <ProtectedRoute>
+                  <DataManagement />
+                </ProtectedRoute>
+              } />
+              
+              {/* Redirect to dashboard by default */}
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </Routes>
+          </Router>
+        </ApiProvider>
       </AuthProvider>
     </ThemeProvider>
   );

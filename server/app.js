@@ -31,7 +31,7 @@ const payrollRoutes = require('./routes/payroll');
 const settingsRoutes = require('./routes/settings');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5005;
 const JWT_SECRET = process.env.JWT_SECRET || 'hris-secret-key';
 
 // Middleware

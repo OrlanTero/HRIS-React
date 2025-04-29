@@ -12,12 +12,12 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import axios from 'axios';
 import EmployeeForm from '../components/employees/EmployeeForm';
-
+import { useApi } from '../contexts/ApiContext';
 const CreateEmployeePage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  
+  const api = useApi();
   const navigate = useNavigate();
   
   const handleSubmit = async (employeeData) => {
@@ -26,7 +26,7 @@ const CreateEmployeePage = () => {
       setError('');
       setSuccess(false);
       
-      await axios.post('/api/employees', employeeData);
+      await api.post('/api/employees', employeeData);
       
       setSuccess(true);
       

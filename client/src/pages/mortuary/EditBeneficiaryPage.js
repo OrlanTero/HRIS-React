@@ -2,21 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Box, Typography, Breadcrumbs, Link as MuiLink, CircularProgress, Alert } from '@mui/material';
 import { Link, useParams } from 'react-router-dom';
 import BeneficiaryForm from '../../components/mortuary/BeneficiaryForm';
-import axios from 'axios';
+import { useApi } from '../../contexts/ApiContext';
 
 const EditBeneficiaryPage = () => {
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [mortuaryId, setMortuaryId] = useState(null);
-
+  const api = useApi();
   useEffect(() => {
     const fetchBeneficiaryDetails = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`/api/beneficiaries/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const response = await api.get(`/api/beneficiaries/${id}`);
         setMortuaryId(response.data.mortuary_id);
         setLoading(false);
       } catch (err) {

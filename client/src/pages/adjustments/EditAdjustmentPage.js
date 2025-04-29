@@ -4,12 +4,13 @@ import { Box, Typography, Container, Paper, Button, CircularProgress } from '@mu
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import AdjustmentForm from '../../components/adjustments/AdjustmentForm';
 import { useAuth } from '../../contexts/AuthContext';
-import axios from 'axios';
+import { useApi } from '../../contexts/ApiContext';
 
 const EditAdjustmentPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { currentUser } = useAuth();
+  const api = useApi();
   const [adjustment, setAdjustment] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,11 +20,7 @@ const EditAdjustmentPage = () => {
     const fetchAdjustment = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`/api/adjustments/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        const response = await api.get(`/api/adjustments/${id}`);
         setAdjustment(response.data);
         setLoading(false);
       } catch (err) {
@@ -33,10 +30,10 @@ const EditAdjustmentPage = () => {
       }
     };
     
-    if (token && id) {
+    if (currentUser && id) {
       fetchAdjustment();
     }
-  }, [token, id]);
+  }, [currentUser, id]);
   
   // Handle successful update
   const handleSuccess = () => {

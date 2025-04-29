@@ -1,0 +1,150 @@
+<?php
+
+global $APPLICATION, $ACTIVITY_LOG_HEADER_TEXT, $ACTIVITY_LOG_BODY_TEXT;
+global $ARCHIVES_HEADER, $ARCHIVES_BODY;
+global $ACTIVITY_CONTROL;
+
+$ARCHIVE_CONTROL = $APPLICATION->FUNCTIONS->ARCHIVE_CONTROL;
+
+$RECORDS = $ACTIVITY_CONTROL->getAllRecords(false);
+$ID = "log_id";
+$BUTTON = false;
+
+$ARCHIVES_RECORDS = $ARCHIVE_CONTROL->getAllRecords(false);
+$ARCHIVES_ID = "archive_id";
+$ARCHIVES_BUTTON = false;
+?>
+
+<?php include "public/views/pages/structures/html_headings.phtml" ?>
+
+<title>Settings</title>
+
+<?php include "public/views/pages/structures/html_heading_closing.phtml" ?>
+
+<?php include "public/views/pages/structures/html_body_open.phtml" ?>
+
+<?php include "public/views/pages/structures/html_opening_parent.phtml" ?>
+
+<div class="left-content">
+
+    <?php include "public/views/pages/structures/html_navbar.phtml" ?>
+
+</div>
+
+<div class="right-content">
+
+    <?php include "public/views/pages/structures/html_right_heading.phtml" ?>
+
+    <div class="right-body">
+        <div class="main-body-content-parent">
+            <div class="main-body-header">
+                <div class="header-nav">
+                    <div class="left">
+                        <div class="title">
+                            <h2>Data Maintenance</h2>
+                        </div>
+                    </div>
+                    <div class="right"></div>
+                </div>
+            </div>
+            <div class="main-body-body">
+                <div class="menu-tab-control-parent menu-bar-maintenance">
+                    <?= CreateMenuBarHeader("maintenance-table", ["Activity Logs", "Data Archives"]) ?>
+
+                    <div class="menu-content-not-official">
+                        <!-- Tab 1: Activity Logs -->
+                        <div class="menu-body-item">
+                            <div class="data-table-content">
+                                <div class="main-table-container table-component">
+                                    <div class="main-table-header">
+                                        <div class="table-header">
+                                            <div class="left">
+                                                <div class="title">
+                                                    <h2>Activity Logs</h2>
+                                                </div>
+                                            </div>
+                                            <div class="center"></div>
+                                            <div class="right"></div>
+                                        </div>
+                                        <div class="table-buttons">
+                                            <div class="left"></div>
+                                            <div class="right">
+                                                <div class="icon-button table-button show-component" data-name="view-request">
+                                                    <div class="icon">
+                                                        <?= UseIcon("eye-thin") ?>
+                                                    </div>
+                                                    <div class="text">
+                                                        <span>View</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="main-table-body main-table-requests">
+                                        <?= CreateTable($ACTIVITY_LOG_HEADER_TEXT, $ACTIVITY_LOG_BODY_TEXT, $RECORDS, $ID, $BUTTON, true, true) ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab 2: Data Archives -->
+                        <div class="menu-body-item">
+                            <div class="data-table-content">
+                                <div class="main-table-container table-component">
+                                    <div class="main-table-header">
+                                        <div class="table-header">
+                                            <div class="left">
+                                                <div class="title">
+                                                    <h2>Data Archives</h2>
+                                                </div>
+                                            </div>
+                                            <div class="center"></div>
+                                            <div class="right">
+                                                <div class="icon-button table-button show-component" data-name="view-request">
+                                                    <div class="icon">
+                                                        <?= UseIcon("eye-thin") ?>
+                                                    </div>
+                                                    <div class="text">
+                                                        <span>View</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="icon-button table-button show-component" data-name="delete-request">
+                                                    <div class="icon">
+                                                        <?= UseIcon("trash-thin") ?>
+                                                    </div>
+                                                    <div class="text">
+                                                        <span>Delete</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="icon-button table-button show-component" data-name="restore-request">
+                                                    <div class="icon">
+                                                        <?= UseIcon("arrow-counter-clockwise-thin") ?>
+                                                    </div>
+                                                    <div class="text">
+                                                        <span>Restore</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="main-table-body main-table-requests">
+                                        <?= CreateTable($ARCHIVES_HEADER, $ARCHIVES_BODY, $ARCHIVES_RECORDS, $ARCHIVES_ID, $ARCHIVES_BUTTON, false, true) ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <?php include "public/views/pages/structures/html_pipes.phtml" ?>
+
+    <script type="module" src="/public/assets/scripts/pages/main/administrator/data_maintenance.js"></script>
+
+    <?php include "public/views/pages/structures/html_closing_parent.phtml" ?>
+
+    <?php include "public/views/pages/structures/html_body_closing.phtml" ?>

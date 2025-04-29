@@ -237,7 +237,7 @@ router.post('/generate/:groupId', authenticateToken, async (req, res) => {
             ot_hours, night_diff_hours, special_holiday_hours,
             special_holiday_ot_hours, legal_holiday_hours,
             legal_holiday_ot_hours, nhw_lh, nhw_lhot,
-            lh_basic_pay, lhot_basic_pay, others,
+            lh_basic_pay, lhot_basic_pay, nhw_ot, others,
             payslip_rates_id, cash_advances, loan_statement, adjustments,
             beneficiaries
           ) VALUES (
@@ -245,7 +245,7 @@ router.post('/generate/:groupId', authenticateToken, async (req, res) => {
             ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-            ?
+            ?, ?
           )`,
           [
             comp.employee_id, comp.client_id, comp.year, comp.period,
@@ -259,7 +259,7 @@ router.post('/generate/:groupId', authenticateToken, async (req, res) => {
             comp.ot_hours || 0, comp.night_diff_hours || 0, comp.special_holiday_hours || 0,
             comp.special_holiday_ot_hours || 0, comp.legal_holiday_hours || 0,
             comp.legal_holiday_ot_hours || 0, comp.nhw_lh || 0, comp.nhw_lhot || 0,
-            comp.lh_basic_pay || 0, comp.lhot_basic_pay || 0, comp.others || 0,
+            comp.lh_basic_pay || 0, comp.lhot_basic_pay || 0, comp.nhw_ot || 0, comp.others || 0,
             rateId, comp.cash_advances || 0, comp.loan_statement || 0, comp.adjustments || 0,
             comp.beneficiaries || ''
           ]
@@ -468,15 +468,15 @@ router.post('/finalize', authenticateToken, async (req, res) => {
       // Update cash advances if any
       if (draft.cash_advances > 0) {
         const [cashAdvances] = await connection.query(
-          `SELECT * FROM cash_advances 
-           WHERE employee_id = ? AND status = 1 AND balance > 0`,
+          `SELECT * FROM loans 
+           WHERE employee_id = ? AND status = 1 AND balance > 0 AND loan_type = 'Cash Advance'`,
           [draft.employee_id]
         );
         
         for (const advance of cashAdvances) {
           await connection.query(
-            'UPDATE cash_advances SET status = 0, balance = 0 WHERE cash_advance_id = ?',
-            [advance.cash_advance_id]
+            'UPDATE loans SET status = 0, balance = 0 WHERE loan_id = ?',
+            [advance.loan_id]
           );
         }
       }

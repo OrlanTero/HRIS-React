@@ -1,0 +1,119 @@
+<?php
+
+global $APPLICATION, $PAYROLL_TABLE_BODY_KEY, $PAYROLL_TABLE_HEADER_TEXT;
+
+$control = $APPLICATION->FUNCTIONS->BANK_CONTROL;
+$RECORDS = [];
+$ID = "";
+$BUTTON = false;
+?>
+
+<?php include "public/views/pages/structures/html_headings.phtml" ?>
+
+<title>Payroll</title>
+
+<?php include "public/views/pages/structures/html_heading_closing.phtml" ?>
+
+<?php include "public/views/pages/structures/html_body_open.phtml" ?>
+
+<?php include "public/views/pages/structures/html_opening_parent.phtml" ?>
+
+<div class="left-content">
+
+    <?php include "public/views/pages/structures/html_navbar.phtml" ?>
+
+</div>
+
+<div class="right-content">
+
+    <?php include "public/views/pages/structures/html_right_heading.phtml" ?>
+
+    <div class="right-body">
+        <div class="main-body-content-parent">
+            <div class="main-body-header">
+                <div class="header-nav">
+                    <div class="left">
+                        <div class="title">
+                            <h2>Manage Payroll</h2>
+                        </div>
+                    </div>
+                    <div class="right"></div>
+                </div>
+            </div>
+            <div class="main-body-body">
+                <div class="data-table-content">
+                    <div class="main-table-container table-component">
+                        <div class="main-table-header">
+                            <div class="table-header">
+                                <div class="left">
+                                    <div class="title">
+                                        <h2>Employees Payroll</h2>
+                                    </div>
+                                </div>
+                                <div class="center">
+                                    <div class="search-engine-parent full-width">
+                                        <div class="search-engine">
+                                            <div class="icon">
+                                                <?= UseIcon("magnifying-glass-thin") ?>
+                                            </div>
+                                            <input type="text" name="search-records" placeholder="Search Records...">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="right"></div>
+                            </div>
+                            <div class="table-buttons">
+                                <div class="left"></div>
+                                <div class="right">
+                                    <div class="icon-button table-button show-component" data-name="view-detail-request">
+                                        <div class="icon">
+                                            <?= UseIcon("eye-thin") ?>
+                                        </div>
+                                        <div class="text">
+                                            <span>View Details</span>
+                                        </div>
+                                    </div>
+                                    <div class="icon-button table-button show-component" data-name="add-request">
+                                        <div class="icon">
+                                            <?= UseIcon("eye-thin") ?>
+                                        </div>
+                                        <div class="text">
+                                            <span>View</span>
+                                        </div>
+                                    </div>
+                                    <div class="icon-button table-button show-component" data-name="view-request">
+                                        <div class="icon">
+                                            <?= UseIcon("eye-thin") ?>
+                                        </div>
+                                        <div class="text">
+                                            <span>Max View</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="main-table-body main-table-requests">
+                            <?= CreateTableAsOptions([
+                                'headerItems' => $PAYROLL_TABLE_HEADER_TEXT,
+                                'bodyItems' => $PAYROLL_TABLE_BODY_KEY,
+                                'data' => $RECORDS,
+                                'idName' => 'id',
+                                'noCheckbox' => false,
+                                'small' => true,
+                                'scrollable' => true,
+                                'toggleColumns' => [16, 17, 28, 29, 30, 31],
+                            ]) ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <?php include "public/views/pages/structures/html_pipes.phtml" ?>
+
+    <script type="module" src="/public/assets/scripts/pages/main/financial/payroll.js"></script>
+
+    <?php include "public/views/pages/structures/html_closing_parent.phtml" ?>
+
+    <?php include "public/views/pages/structures/html_body_closing.phtml" ?>

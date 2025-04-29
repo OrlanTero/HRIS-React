@@ -1,0 +1,44 @@
+<?php
+global $APPLICATION;
+
+$data = json_decode($_POST['data'], true);
+
+$data = json_decode($data["data"], true);
+
+
+?>
+<div class="main-popup-container">
+    <div class="popup-background"></div>
+    <div class="popup-content">
+        <div class="main-popup-table">
+            <div class="popup-top">
+                <div class="headline">
+                    <h1>View Payroll Detail</h1>
+                </div>
+                <div class="paragraph">
+                    <p>Other Details</p>
+                </div>
+
+                <div class="floating-button">
+                    <div class="close-popup popup-button">
+                        <?= UseIcon('close') ?>
+                    </div>
+                </div>
+            </div>
+            <form action="" class="form-control">
+                <div class="popup-bot">
+                    <ul class="main-info-container">
+                        <?php foreach ($data as $row): ?>
+
+                        <li class="row">
+                            <div class="left"><?= $row['text']?></div>
+                            <div class="right"><?= $row['value']?></div>
+                        </li>
+
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -47,8 +47,8 @@ import {
   Phone as PhoneIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
+import { useApi } from '../contexts/ApiContext';
 import EmployeeForm from '../components/employees/EmployeeForm';
 import PageLayout from '../components/layouts/PageLayout';
 
@@ -67,7 +67,8 @@ const EmployeeListPage = () => {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   
   const navigate = useNavigate();
-  const { currentUser, token } = useAuth();
+  const { currentUser } = useAuth();
+  const api = useApi();
   const theme = useTheme();
   
   // Fetch employees from the API
@@ -76,11 +77,7 @@ const EmployeeListPage = () => {
       setLoading(true);
       setError('');
       
-      const response = await axios.get('/api/employees', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const response = await api.get('/api/employees');
       setEmployees(response.data);
     } catch (err) {
       console.error('Error fetching employees:', err);
@@ -110,11 +107,7 @@ const EmployeeListPage = () => {
   
   const handleDeleteConfirm = async () => {
     try {
-      await axios.delete(`/api/employees/${employeeToDelete.employee_id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      await api.delete(`/api/employees/${employeeToDelete.employee_id}`);
       
       // Remove from state
       setEmployees(employees.filter(emp => emp.employee_id !== employeeToDelete.employee_id));
@@ -131,11 +124,7 @@ const EmployeeListPage = () => {
   const handleCreateEmployee = async (formData) => {
     try {
       setFormSubmitting(true);
-      const response = await axios.post('/api/employees', formData, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const response = await api.post('/api/employees', formData);
       
       // Add the new employee to the state
       setEmployees([...employees, response.data]);

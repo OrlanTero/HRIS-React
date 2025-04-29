@@ -6,7 +6,7 @@ import reportWebVitals from './reportWebVitals';
 
 // Set up axios base URL (needs to be adjusted for production)
 import axios from 'axios';
-axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5005';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

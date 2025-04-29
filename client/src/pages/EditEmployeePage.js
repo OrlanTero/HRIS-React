@@ -12,6 +12,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import axios from 'axios';
 import EmployeeForm from '../components/employees/EmployeeForm';
+import { useApi } from '../contexts/ApiContext';
+
 
 const EditEmployeePage = () => {
   const [employee, setEmployee] = useState(null);
@@ -22,7 +24,7 @@ const EditEmployeePage = () => {
   
   const navigate = useNavigate();
   const { id } = useParams();
-  
+  const api = useApi();
   // Fetch employee data
   useEffect(() => {
     const fetchEmployee = async () => {
@@ -30,7 +32,7 @@ const EditEmployeePage = () => {
         setLoading(true);
         setError('');
         
-        const response = await axios.get(`/api/employees/${id}`);
+        const response = await api.get(`/api/employees/${id}`);
         
         // Ensure bankAccounts is an array
         const employeeData = {
@@ -56,7 +58,7 @@ const EditEmployeePage = () => {
       setError('');
       setSuccess(false);
       
-      await axios.put(`/api/employees/${id}`, employeeData);
+      await api.put(`/api/employees/${id}`, employeeData);
       
       setSuccess(true);
       

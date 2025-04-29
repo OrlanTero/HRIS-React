@@ -5,11 +5,12 @@ import {
   CircularProgress, Alert 
 } from '@mui/material';
 import { Link, useParams } from 'react-router-dom';
-import axios from 'axios';
+import { useApi } from '../../contexts/ApiContext';
 import BeneficiaryList from '../../components/mortuary/BeneficiaryList';
 
 const MortuaryDetailPage = () => {
   const { id } = useParams();
+  const api = useApi();
   const [mortuary, setMortuary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -23,10 +24,7 @@ const MortuaryDetailPage = () => {
   const fetchMortuary = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`/api/mortuaries/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get(`/api/mortuaries/${id}`);
       setMortuary(response.data);
       setError(null);
     } catch (err) {
@@ -40,10 +38,7 @@ const MortuaryDetailPage = () => {
   const handleDeleteBeneficiary = async (beneficiaryId) => {
     try {
       setBeneficiariesLoading(true);
-      const token = localStorage.getItem('token');
-      await axios.delete(`/api/beneficiaries/${beneficiaryId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/api/beneficiaries/${beneficiaryId}`);
       
       // Refresh the mortuary to get updated beneficiaries
       fetchMortuary();

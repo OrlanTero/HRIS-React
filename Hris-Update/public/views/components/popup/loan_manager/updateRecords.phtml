@@ -1,0 +1,22 @@
+<?php
+
+global $APPLICATION, $LOAN_MANAGER_TABLE_BODY_KEY, $LOAN_MANAGER_TABLE_HEADER_TEXT;
+
+use Application\models\LoanAnalyzer;
+
+$ANALYZER = new LoanAnalyzer();
+
+$control = $APPLICATION->FUNCTIONS->BANK_CONTROL;
+$RECORDS = array_map(function ($record) { return (array) $record; }, $ANALYZER->get());
+$ID = "loan_id";
+$BUTTON = false;
+
+echo CreateTable($LOAN_MANAGER_TABLE_HEADER_TEXT, $LOAN_MANAGER_TABLE_BODY_KEY, $RECORDS, $ID, $BUTTON, true, true, true, false, [
+    ["column" => 6, "color" => "#FEBEBF", "align" => "right"],
+    ["column" => 7, "color" => "#BEBFFF", "align" => "right"],
+    ["column" => 8, "color" => "#BEBFFF", "align" => "right"],
+    ["column" => 9, "color" => "#FAFDC6", "align" => "right"],
+    ["column" => 10, "color" => "#C1FEBE", "align" => "right"],
+    ["column" => 11, "color" => "#C1FEBE", "align" => "right"],
+    ["column" => 12, "color" => "", "align" => "right"],
+]);

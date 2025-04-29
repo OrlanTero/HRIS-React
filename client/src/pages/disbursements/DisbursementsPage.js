@@ -44,12 +44,13 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLocation } from 'react-router-dom';
-import axios from 'axios';
+import { useApi } from '../../contexts/ApiContext';
 import DisbursementForm from '../../components/disbursements/DisbursementForm';
 
 const DisbursementsPage = () => {
-  const { token } = useAuth();
+  const { currentUser } = useAuth();
   const location = useLocation();
+  const api = useApi();
   const [loading, setLoading] = useState(true);
   const [disbursements, setDisbursements] = useState([]);
   const [page, setPage] = useState(0);
@@ -74,11 +75,7 @@ const DisbursementsPage = () => {
       setLoading(true);
       setError(null);
 
-      const response = await axios.get('/api/disbursements', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const response = await api.get('/api/disbursements');
 
       setDisbursements(response.data);
       setLoading(false);
@@ -90,10 +87,10 @@ const DisbursementsPage = () => {
   };
 
   useEffect(() => {
-    if (token) {
+    if (currentUser) {
       fetchDisbursements();
     }
-  }, [token, refreshKey]);
+  }, [currentUser, refreshKey]);
 
   useEffect(() => {
     // Check URL for requisitionId parameter
@@ -237,11 +234,7 @@ const DisbursementsPage = () => {
   // Handle update status (post/unpost)
   const handleUpdateStatus = async (id, newStatus) => {
     try {
-      await axios.put(`/api/disbursements/${id}/status`, { posted: newStatus }, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      await api.put(`/api/disbursements/${id}/status`, { posted: newStatus });
       
       setRefreshKey(prev => prev + 1);
     } catch (err) {
@@ -253,11 +246,7 @@ const DisbursementsPage = () => {
   // Handle delete disbursement
   const handleDeleteDisbursement = async () => {
     try {
-      await axios.delete(`/api/disbursements/${currentDisbursementId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      await api.delete(`/api/disbursements/${currentDisbursementId}`);
       
       handleCloseDeleteDialog();
       setRefreshKey(prev => prev + 1);

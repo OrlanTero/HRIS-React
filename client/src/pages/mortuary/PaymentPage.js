@@ -4,12 +4,12 @@ import {
   CircularProgress, Alert 
 } from '@mui/material';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import PaymentList from '../../components/mortuary/PaymentList';
-
+import { useApi } from '../../contexts/ApiContext';
 const PaymentPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const api = useApi();
   const [payments, setPayments] = useState([]);
   const [beneficiary, setBeneficiary] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -22,19 +22,14 @@ const PaymentPage = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
       
       // Fetch beneficiary details
-      const beneficiaryResponse = await axios.get(`/api/beneficiaries/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const beneficiaryResponse = await api.get(`/api/beneficiaries/${id}`);
       
       setBeneficiary(beneficiaryResponse.data);
       
       // Fetch payments for this beneficiary
-      const paymentsResponse = await axios.get(`/api/mortuary-payments/beneficiary/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const paymentsResponse = await api.get(`/api/mortuary-payments/beneficiary/${id}`);
       
       setPayments(paymentsResponse.data);
       setError(null);
@@ -49,10 +44,7 @@ const PaymentPage = () => {
   const handleDeletePayment = async (paymentId) => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-      await axios.delete(`/api/mortuary-payments/${paymentId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/api/mortuary-payments/${paymentId}`);
       
       // Refresh the payments list
       fetchData();
@@ -66,7 +58,6 @@ const PaymentPage = () => {
   const handleAddPayment = async (paymentData) => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
       
       const data = {
         ...paymentData,
@@ -74,9 +65,7 @@ const PaymentPage = () => {
         employee_id: beneficiary.employee_id
       };
       
-      await axios.post('/api/mortuary-payments', data, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.post('/api/mortuary-payments', data);
       
       // Refresh the payments list
       fetchData();

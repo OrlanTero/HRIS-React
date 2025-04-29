@@ -1,0 +1,106 @@
+<?php
+
+global $APPLICATION, $LOAN_MANAGER_TABLE_BODY_KEY, $LOAN_MANAGER_TABLE_HEADER_TEXT;
+
+use Application\models\LoanAnalyzer;
+
+$ANALYZER = new LoanAnalyzer();
+
+$control = $APPLICATION->FUNCTIONS->BANK_CONTROL;
+$RECORDS = array_map(function ($record) { return (array) $record; }, $ANALYZER->get());
+$ID = "loan_id";
+$BUTTON = false;
+?>
+
+<?php include "public/views/pages/structures/html_headings.phtml" ?>
+
+<title>Loan Manager</title>
+
+<?php include "public/views/pages/structures/html_heading_closing.phtml" ?>
+
+<?php include "public/views/pages/structures/html_body_open.phtml" ?>
+
+<?php include "public/views/pages/structures/html_opening_parent.phtml" ?>
+
+<div class="left-content">
+
+    <?php include "public/views/pages/structures/html_navbar.phtml" ?>
+
+</div>
+
+<div class="right-content">
+
+    <?php include "public/views/pages/structures/html_right_heading.phtml" ?>
+
+    <div class="right-body">
+        <div class="main-body-content-parent">
+            <div class="main-body-header">
+                <div class="header-nav">
+                    <div class="left">
+                        <div class="title">
+                            <h2>Manage Loan Manager</h2>
+                        </div>
+                    </div>
+                    <div class="right"></div>
+                </div>
+            </div>
+            <div class="main-body-body">
+                <div class="data-table-content">
+                    <div class="main-table-container table-component">
+                        <div class="main-table-header">
+                            <div class="table-header">
+                                <div class="left">
+                                    <div class="title">
+                                        <h2>Loan Manager</h2>
+                                    </div>
+                                </div>
+                                <div class="center">
+                                    <div class="search-engine-parent full-width">
+                                        <div class="search-engine">
+                                            <div class="icon">
+                                                <?= UseIcon("magnifying-glass-thin") ?>
+                                            </div>
+                                            <input type="text" name="search-records" placeholder="Search Records...">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="right"></div>
+                            </div>
+                            <div class="table-buttons">
+                                <div class="left"></div>
+                                <div class="right">
+                                    <div class="icon-button table-button show-component" data-name="add-request">
+                                        <div class="icon">
+                                            <?= UseIcon("eye-thin") ?>
+                                        </div>
+                                        <div class="text">
+                                            <span>View Loan Manager</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="main-table-body main-table-requests">
+                            <?= CreateTable($LOAN_MANAGER_TABLE_HEADER_TEXT, $LOAN_MANAGER_TABLE_BODY_KEY, $RECORDS, $ID, $BUTTON, true, true, true, false, [
+                                    ["column" => 6, "color" => "#FEBEBF", "align" => "right"],
+                                    ["column" => 7, "color" => "#BEBFFF", "align" => "right"],
+                                    ["column" => 8, "color" => "#BEBFFF", "align" => "right"],
+                                    ["column" => 9, "color" => "#FAFDC6", "align" => "right"],
+                                    ["column" => 10, "color" => "#C1FEBE", "align" => "right"],
+                                    ["column" => 11, "color" => "#C1FEBE", "align" => "right"],
+                                    ["column" => 12, "color" => "", "align" => "right"],
+                            ]) ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <?php include "public/views/pages/structures/html_pipes.phtml" ?>
+
+    <script type="module" src="/public/assets/scripts/pages/main/financial/loan_manager.js"></script>
+
+    <?php include "public/views/pages/structures/html_closing_parent.phtml" ?>
+
+    <?php include "public/views/pages/structures/html_body_closing.phtml" ?>

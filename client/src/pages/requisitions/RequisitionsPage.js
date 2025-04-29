@@ -45,10 +45,12 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useApi } from '../../contexts/ApiContext';
 import RequisitionForm from '../../components/requisitions/RequisitionForm';
 
 const RequisitionsPage = () => {
   const { token } = useAuth();
+  const api = useApi();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [requisitions, setRequisitions] = useState([]);
@@ -73,11 +75,7 @@ const RequisitionsPage = () => {
       setLoading(true);
       setError(null);
 
-      const response = await axios.get('/api/requisitions', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const response = await api.get('/api/requisitions');
 
       setRequisitions(response.data);
       setLoading(false);
@@ -232,11 +230,7 @@ const RequisitionsPage = () => {
   // Handle delete requisition
   const handleDeleteRequisition = async () => {
     try {
-      await axios.delete(`/api/requisitions/${currentRequisitionId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      await api.delete(`/api/requisitions/${currentRequisitionId}`);
       
       handleCloseDeleteDialog();
       setRefreshKey(prev => prev + 1);

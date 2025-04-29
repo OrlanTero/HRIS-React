@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
-import axios from 'axios';
+import { useApi } from '../../contexts/ApiContext';
 import LoanPaymentsList from '../../components/loans/LoanPaymentsList';
 import LoanPaymentForm from '../../components/loans/LoanPaymentForm';
 
@@ -38,7 +38,8 @@ function TabPanel(props) {
 }
 
 const LoanPaymentsPage = () => {
-  const { token } = useAuth();
+  const { currentUser } = useAuth();
+  const api = useApi();
   const [tabValue, setTabValue] = useState(0);
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -50,9 +51,7 @@ const LoanPaymentsPage = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('/api/loan-payments', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get('/api/loan-payments');
       setPayments(response.data);
     } catch (err) {
       console.error('Failed to fetch loan payments:', err);
@@ -86,7 +85,7 @@ const LoanPaymentsPage = () => {
   // Initial data load
   useEffect(() => {
     fetchPayments();
-  }, [token]);
+  }, [currentUser]);
 
   return (
     <Container maxWidth="lg">

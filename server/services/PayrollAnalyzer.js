@@ -134,8 +134,8 @@ class PayrollAnalyzer {
       let cashAdvances = [];
       try {
         [cashAdvances] = await pool.query(
-          `SELECT * FROM cash_advances 
-           WHERE employee_id = ? AND status = 1 AND balance > 0`,
+          `SELECT * FROM loans 
+           WHERE employee_id = ? AND status = 1 AND balance > 0 AND loan_type = 'Cash Advance'`,
           [employee.employee_id]
         );
       } catch (error) {
@@ -182,9 +182,9 @@ class PayrollAnalyzer {
       let adjustments = [];
       try {
         [adjustments] = await pool.query(
-          `SELECT * FROM adjustments 
-           WHERE employee_id = ? AND status = 1 AND year = ? AND period = ?`,
-          [employee.employee_id, this.group.year, this.group.period]
+          `SELECT * FROM adjustment 
+           WHERE employee_id = ? AND status = 1 AND db_status = 1`,
+          [employee.employee_id]
         );
       } catch (error) {
         console.error(`Error fetching adjustments for employee ${employee.employee_id}:`, error);
@@ -195,8 +195,9 @@ class PayrollAnalyzer {
       let beneficiaries = [];
       try {
         [beneficiaries] = await pool.query(
-          `SELECT * FROM beneficiaries 
-           WHERE year = ? AND period = ?`,
+          `SELECT b.* FROM beneficiaries b
+           JOIN mortuaries m ON b.mortuary_id = m.mortuary_id
+           WHERE m.year = ? AND m.period = ?`,
           [this.group.year, this.group.period]
         );
       } catch (error) {
@@ -320,7 +321,8 @@ class PayrollAnalyzer {
       NHWSHBP: rates.SPECIAL_HOLIDAY * hours[ATTENDANCE_TYPES.SPECIAL_HOLIDAY],
       SHOTBP: rates.SPECIAL_HOLIDAY_OT * hours[ATTENDANCE_TYPES.SPECIAL_HOLIDAY_OT],
       NHWLHBP: rates.LEGAL_HOLIDAY * hours[ATTENDANCE_TYPES.LEGAL_HOLIDAY],
-      LHOTBP: rates.LEGAL_HOLIDAY_OT * hours[ATTENDANCE_TYPES.LEGAL_HOLIDAY_OT]
+      LHOTBP: rates.LEGAL_HOLIDAY_OT * hours[ATTENDANCE_TYPES.LEGAL_HOLIDAY_OT],
+      OTBP: rates.REGULAR_OT * hours[ATTENDANCE_TYPES.OT]
     };
   }
 
@@ -428,6 +430,7 @@ class PayrollAnalyzer {
       // Work metrics
       ndw: ndw,
       nhw: hours[ATTENDANCE_TYPES.REGULAR],
+      nhw_ot: hours[ATTENDANCE_TYPES.OT],
       
       // Rest day
       rest_day: payValues.RR,

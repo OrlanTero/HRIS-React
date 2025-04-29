@@ -20,7 +20,7 @@ import {
   AccountBalance as LoanIcon
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
-import axios from 'axios';
+import { useApi } from '../../contexts/ApiContext';
 import LoansList from '../../components/loans/LoansList';
 import LoanPaymentsList from '../../components/loans/LoanPaymentsList';
 import LoanStatsCard from '../../components/loans/LoanStatsCard';
@@ -49,7 +49,8 @@ function TabPanel(props) {
 }
 
 const LoanManagerPage = () => {
-  const { token } = useAuth();
+  const { currentUser } = useAuth();
+  const api = useApi();
   const [tabValue, setTabValue] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loans, setLoans] = useState([]);
@@ -64,23 +65,20 @@ const LoanManagerPage = () => {
   const [newPaymentDialogOpen, setNewPaymentDialogOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
+
   useEffect(() => {
-    if (token) {
+    if (currentUser) {
       fetchData();
     }
-  }, [token, refreshKey]);
+  }, [currentUser, refreshKey]);
 
   const fetchData = async () => {
     setLoading(true);
     try {
       // Fetch loans and payments in parallel
       const [loansResponse, paymentsResponse] = await Promise.all([
-        axios.get('/api/loans', {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        axios.get('/api/loan-payments', {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        api.get('/api/loans'),
+        api.get('/api/loan-payments')
       ]);
 
       setLoans(loansResponse.data);
@@ -145,7 +143,7 @@ const LoanManagerPage = () => {
             </Button>
           </Box>
         </Box>
-        
+
         <Grid container spacing={3} sx={{ mb: 3 }}>
           <Grid item xs={12} md={3}>
             <LoanStatsCard

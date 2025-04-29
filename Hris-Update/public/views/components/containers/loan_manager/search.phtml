@@ -1,0 +1,168 @@
+<?php
+
+global $APPLICATION;
+$data = json_decode($_POST["data"], true);
+
+$filter = [];
+
+$filterDate = [];
+
+if (isset($data["start_date"])) {
+    $filterDate["start_date"] = $data["start_date"];
+}
+
+if (isset($data["end_date"])) {
+    $filterDate["end_date"] = $data["end_date"];
+}
+
+if (isset($data["employee_id"])) {
+    $filter["loans.employee_id"] = $data["employee_id"];
+}
+
+if (isset($data["advance"])) {
+    if (count($filterDate) > 0) {
+        $records = $APPLICATION->FUNCTIONS->LOAN_CONTROL->searchRecordsWithBetweenDates(isset($data["search"]) ? $data["search"] : "", true, array_merge(['advance' => '0'], $filter), 'loans.date_created', $filterDate);
+    } else {
+        $records = $APPLICATION->FUNCTIONS->LOAN_CONTROL->searchRecords(isset($data["search"]) ? $data["search"] : "", true, array_merge(['advance' => '0'], $filter));
+    }
+} else {
+    if (count($filterDate) > 0) {
+        $records = $APPLICATION->FUNCTIONS->LOAN_ADVANCE_CONTROL->searchRecordsWithBetweenDates(isset($data["search"]) ? $data["search"] : "", true, array_merge(['advance' => '1'], $filter), 'loans.date_created', $filterDate);
+    } else {
+        $records = $APPLICATION->FUNCTIONS->LOAN_ADVANCE_CONTROL->searchRecords(isset($data["search"]) ? $data["search"] : "", true, array_merge(['advance' => '1'], $filter));
+    }
+}
+
+?>
+
+<?php if (count($records) > 0) : ?>
+    <div class="result-container">
+    <div class="advance-loan-cards">
+        <?php foreach ($records as $record) : ?>
+            <div class="advance-loan-card">
+                <div class="card-head">
+                    <h3 class="employee-name"><?php echo $record->getEmployee()->firstname . ' ' . $record->getEmployee()->lastname; ?></h3>
+                    <span class="loan-date"><?php echo date('M d, Y', strtotime($record->date_created)); ?></span>
+                </div>
+                <div class="card-body">
+                    <div class="loan-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Loan Amount</span>
+                            <span class="detail-value" data-amount="true">₱<?php echo number_format($record->amount, 2); ?></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Balance</span>
+                            <span class="detail-value" data-balance="true">₱<?php echo number_format($record->balance, 2); ?></span>
+                        </div>
+                     
+                        <?php if ($record->advance == 1) : ?>
+                            <div class="detail-item">
+                                <span class="detail-label">Interest</span>
+                                <span class="detail-value"><?php echo number_format($record->interest_rate, 2); ?>%</span>
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="detail-item">
+                            <span class="detail-label">Type</span>
+                            <span class="detail-value"><?php echo $record->type->type; ?></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Terms</span>
+                            <span class="detail-value"><?php echo $record->terms; ?></span>
+                        </div>
+                    </div>
+                    <?php if($record->advance == 1 && $record->getCurrentPeriodStatements() !== null) : ?>
+                        <div class="next-statement">
+                            <span class="statement-label">Next Statement</span>
+                            <span class="statement-date"><?php echo date('M d, Y', strtotime($record->getNextStatementDate())); ?></span>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+
+<style>
+.result-container {
+    padding: 20px;
+}
+
+.advance-loan-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.advance-loan-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.advance-loan-card:hover {
+    transform: translateY(-5px);
+}
+
+.card-head {
+    background-color: #3498db;
+    color: #ffffff;
+    padding: 15px;
+}
+
+.employee-name {
+    margin: 0;
+    font-size: 1.2em;
+}
+
+.loan-date {
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+.card-body {
+    padding: 15px;
+}
+
+.loan-details {
+    margin-bottom: 15px;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.detail-label {
+    color: #7f8c8d;
+}
+
+.detail-value {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.next-statement {
+    background-color: #f1f8ff;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+}
+
+.statement-label {
+    display: block;
+    color: #7f8c8d;
+    margin-bottom: 5px;
+}
+
+.statement-date {
+    font-weight: bold;
+    color: #2c3e50;
+}
+</style>
+
+
+<?php endif ?>

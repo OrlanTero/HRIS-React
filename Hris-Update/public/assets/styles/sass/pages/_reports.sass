@@ -1,0 +1,232 @@
+
+.reports-main-container
+  margin: 40px
+  min-height: calc(100vh - 250px)
+  border-radius: 6px
+  background: #ffffff
+  padding: 20px
+  position: relative
+  border-top-left-radius: 25px
+  border-top-right-radius: 25px
+  box-shadow: $component_boxshadow
+  .main-header
+    display: flex
+    height: 60px
+    min-height: 60px
+    .header-item
+      width: 100%
+      height: 100%
+      background: #ffffff
+      display: flex
+      justify-content: center
+      align-content: center
+      align-items: center
+      cursor: pointer
+      &:hover
+        background: #ebeeee
+      span
+        font-size: 20px
+        user-select: none
+
+.left-right-content-main
+  width: 100%
+  height: 100%
+  display: flex
+  min-height: calc(100vh - 380px)
+  .left-content-main
+    width: 33%
+    height: 100%
+    .item-nav
+      padding: 10px
+      cursor: pointer
+      user-select: none
+      &:hover
+        background: #ebeeee
+  .right-content-main
+    width: 67%
+    height: 100%
+    padding: 10px
+
+.side-bar-picker
+  .side-bar-button
+    &.active
+      background: #ebeeee
+  .side-bar-content
+    display: none
+    &.active
+      display: block !important
+
+
+.main-con
+  width: 100%
+  .right
+    display: flex
+    justify-content: center
+    align-items: center
+  .head
+    display: flex
+    justify-content: space-between
+    .input-flex
+      display: flex
+      align-items: center
+      margin: 0 20px
+
+.footer-content
+  display: flex
+  justify-content: flex-end
+  .icon-button
+    padding: 10px
+    display: flex
+    justify-content: center
+    align-items: center
+    width: 180px
+
+
+.body-content-form
+  width: 100%
+  height: 100%
+  display: flex
+  justify-content: center
+  align-items: center
+  min-height: calc(100vh - 400px)
+  .content
+    display: block
+    width: 80%
+
+    .form-group
+      width: 80%
+      display: block
+      margin: 20px
+.print-preview-container
+  padding: 10px
+.print-preview-header
+  padding: 10px
+  text-align: center
+  .title-parent
+    display: flex
+    justify-content: center
+    align-items: center
+  .title-container
+    margin: 20px 10px
+    padding: 10px
+    border: 1px solid #050505
+    text-align: center
+  .title-container-fill
+    margin: 20px 10px
+    padding: 10px
+    border: 1px solid #050505
+    text-align: center
+    width: 250px
+    background: #ebeeee
+    .title
+      font-size: 15px
+.print-preview-sub-body
+  display: flex
+  justify-content: space-between
+  padding: 10px
+  .text
+    display: flex
+    align-items: center
+    .left
+      margin-right: 20px
+  .all-text
+    text-align: right
+.print-preview-footer
+  display: flex
+  justify-content: space-between
+  //align-items: center
+  border-top: 1px solid #050505
+  padding: 10px 0
+  .sub-total-container
+    padding: 0 20px
+    text-align: right
+    color: #1b6d85 !important
+    font-weight: 600
+    font-size: 15px
+  .total-container
+    padding: 20px
+    display: flex
+    font-weight: 600
+    font-size: 18px
+    .t-l
+      margin-right: 30px
+    .t-r
+      border-bottom: 1px solid #050505
+      width: 150px
+      text-align: right
+.print-preview-extra
+  display: flex
+  justify-content: space-between
+  .payment-information-parent
+    .payment-information
+      padding: 20px
+      margin: 10px
+      border: 1px solid #050505
+      .item
+        display: flex
+        min-width: 250px
+        font-size: 14px
+        .l
+          width: 120px
+
+  .signature-containers
+    display: flex
+    padding: 20px 20px
+    .singature-container
+      padding: 0 0
+      text-align: center
+      width: 200px
+      display: flex
+      flex-direction: column
+      justify-content: center
+      align-items: center
+      margin: 0 20px
+      border-top: 1px solid #050505
+      p
+        text-align: center
+
+.pay-slip-container
+  padding: 10px
+  border: 1px dashed #050505
+  margin: 5px
+  .top
+    .one,.two,.three
+      display: flex
+      justify-content: space-between
+      padding: 5px
+      align-items: center
+      align-content: center
+  .body
+    display: flex
+    padding: 5px
+    .left
+      width: 100%
+    .right
+      width: 100%
+    .body-grid
+      margin: 10px
+      .head
+        display: flex
+        justify-content: space-between
+        align-items: center
+        align-content: center
+        margin: 10px 0
+        padding: 10px
+        p:nth-child(2)
+          font-weight: bold
+
+      table
+        th,td
+          padding: 10px
+
+.payslip-head-info
+  padding: 0 10px
+  .info-main
+    display: flex
+    justify-content: center
+    padding: 5px
+  .info-text
+    padding: 10px
+    display: flex
+    .left
+      width: 100px

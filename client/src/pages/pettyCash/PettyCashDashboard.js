@@ -32,12 +32,13 @@ import {
   AttachMoney as MoneyIcon
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
-import axios from 'axios';
+import { useApi } from '../../contexts/ApiContext';
 import PettyCashForm from '../../components/pettyCash/PettyCashForm';
 import PettyCashReportForm from '../../components/pettyCash/PettyCashReportForm';
 
 const PettyCashDashboard = () => {
   const { token } = useAuth();
+  const api = useApi();
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
   const [summary, setSummary] = useState({
@@ -62,27 +63,15 @@ const PettyCashDashboard = () => {
         setError(null);
 
         // Fetch summary
-        const summaryResponse = await axios.get('/api/pettyCash/summary', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        const summaryResponse = await api.get('/api/pettyCash/summary');
         setSummary(summaryResponse.data);
 
         // Fetch transactions
-        const transactionsResponse = await axios.get('/api/pettyCash', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        const transactionsResponse = await api.get('/api/pettyCash');
         setTransactions(transactionsResponse.data);
 
         // Fetch reports
-        const reportsResponse = await axios.get('/api/pettyCash/reports/all', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        const reportsResponse = await api.get('/api/pettyCash/reports/all');
         setReports(reportsResponse.data);
 
         setLoading(false);
@@ -165,11 +154,7 @@ const PettyCashDashboard = () => {
   // Handle delete transaction
   const handleDeleteTransaction = async () => {
     try {
-      await axios.delete(`/api/pettyCash/${currentTransactionId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      await api.delete(`/api/pettyCash/${currentTransactionId}`);
       
       handleCloseDeleteDialog();
       handleRefresh();

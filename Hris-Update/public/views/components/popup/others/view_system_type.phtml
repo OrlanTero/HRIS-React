@@ -1,0 +1,85 @@
+<?php
+global $APPLICATION;
+
+$data = json_decode($_POST['data'], true);
+
+$id = $data["id"];
+
+$control = $APPLICATION->FUNCTIONS->SYSTEM_TYPES_CONTROL;
+
+$systemType = $control->get($id, true);
+
+?>
+<div class="main-popup-container">
+    <div class="popup-background"></div>
+    <div class="popup-content">
+        <div class="main-popup-content">
+            <div class="popup-top">
+                <div class="headline">
+                    <h1>New Type</h1>
+                </div>
+                <div class="paragraph">
+                    <p>Enter required field</p>
+                </div>
+
+                <div class="floating-button">
+                    <div class="close-popup popup-button">
+                        <?= UseIcon('close') ?>
+                    </div>
+                </div>
+            </div>
+            <form action="" class="form-control">
+                <div class="popup-bot">
+                    <div class="form-group-container flex">
+                        <div class="form-group tooltip">
+                            <div class="tooltiptext">
+                                <span>Type</span>
+                            </div>
+                            <div class="error-container">
+                                <input type="text" name="type" placeholder="Type" value="<?= $systemType->type ?>">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group-container flex">
+                        <div class="form-group tooltip">
+                            <div class="tooltiptext">
+                                <span>Affects IN</span>
+                            </div>
+                            <div class="error-container">
+                                <?= CreateComboBox("affects_in", "Affect In", array_map(function ($r) {
+                                    return ["text" => $r->name, "value" => $r->value];
+                                }, SystemTypeAffects::cases()), false, ["text" => array_column(SystemTypeAffects::cases(), "name")[(int) $systemType->affects_in], "value" => $systemType->affects_in]) ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group-container flex">
+                        <div class="form-group tooltip">
+                            <div class="tooltiptext">
+                                <span>Effect</span>
+                            </div>
+                            <div class="error-container">
+                                <?= CreateComboBox("affects_value", "Effect", array_map(function ($r) {
+                                    return ["text" => $r->name, "value" => $r->value];
+                                }, SystemTypeAffectValue::cases()), false, ["text" => array_column(SystemTypeAffectValue::cases(), "name")[(int) $systemType->affects_value], "value" => $systemType->affects_value]) ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="popup-footer">
+                    <div class="form-group-container submit-group right-side">
+                        <div class="form-group">
+                            <div class="link clear-form">
+                                <span>Clear</span>
+                            </div>
+                        </div>
+                        <div class="form-group filled-green">
+                            <input type="submit" value="Save">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

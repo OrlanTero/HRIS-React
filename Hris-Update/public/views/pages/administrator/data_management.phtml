@@ -1,0 +1,382 @@
+<?php
+
+global $APPLICATION, $NO_TYPE_TABLE_HEADER_TEXT, $NO_TYPE_TABLE_BODY_KEY;
+global $SERVICES_DEDUCTION_TABLE_BODY_KEY, $SERVICES_DEDUCTION_TABLE_HEADER_TEXT;
+
+use Application\controllers\system\UserProfileControl;
+
+$systemTypeControl = $APPLICATION->FUNCTIONS->SYSTEM_TYPES_CONTROL;
+$serviceDeductionTypeControl = $APPLICATION->FUNCTIONS->SERVICE_DEDUCTION_CONTROL;
+$backupControl = $APPLICATION->FUNCTIONS->DATABASE_BACKUPS_CONTROL;
+$control = $control = new UserProfileControl();
+
+$LOANTYPES = $systemTypeControl->filterRecords(["category" => "loan_type"], false);
+$EXPENSESTYPES = $systemTypeControl->filterRecords(["category" => "expense_type"], false);
+$SSS = $serviceDeductionTypeControl->filterRecords(["category" => "sss"], false);
+$PHIL = $serviceDeductionTypeControl->filterRecords(["category" => "phil"], false);
+$PAGIBIG = $serviceDeductionTypeControl->filterRecords(["category" => "pagibig"], false);
+
+$ID = "employment_id";
+$BUTTON = false;
+
+$profile = $control->getProfile();
+?>
+
+<?php include "public/views/pages/structures/html_headings.phtml" ?>
+
+<title>Settings</title>
+
+<?php include "public/views/pages/structures/html_heading_closing.phtml" ?>
+
+<?php include "public/views/pages/structures/html_body_open.phtml" ?>
+
+<?php include "public/views/pages/structures/html_opening_parent.phtml" ?>
+
+<div class="left-content">
+
+    <?php include "public/views/pages/structures/html_navbar.phtml" ?>
+
+</div>
+
+<div class="right-content">
+
+    <?php include "public/views/pages/structures/html_right_heading.phtml" ?>
+
+    <div class="right-body">
+        <div class="main-body-content-parent">
+            <div class="main-body-header">
+                <div class="header-nav">
+                    <div class="left">
+                        <div class="title">
+                            <h2>Manage Settings</h2>
+                        </div>
+                    </div>
+                    <div class="right"></div>
+                </div>
+            </div>
+            <div class="main-body-body">
+
+                <div class="menu-tab-control-parent menu-bar-settings">
+                    <?= CreateMenuBarHeader("settings-table",["Loan Type", "Expense Type", "SSS", "PH", "Pag-ibig", "Year, Period and Month", "Database Management"]) ?>
+
+                    <div class="menu-content-not-official">
+                        <div class="menu-body-item system_type_table" data-category="loan_type">
+                            <div class="data-table-content">
+                                <div class="main-table-container table-component full">
+                                    <div class="main-table-header">
+                                        <div class="table-header">
+                                            <div class="left">
+                                                <div class="title">
+                                                    <h2>List of Loans</h2>
+                                                </div>
+                                            </div>
+                                            <div class="center">
+
+                                            </div>
+                                            <div class="right">
+                                                <div class="icon-button table-button show-component" data-name="delete-request">
+                                                    <div class="icon">
+                                                        <?= UseIcon("trash-thin") ?>
+                                                    </div>
+                                                </div>
+
+                                                <div class="icon-button table-button show-component" data-name="view-request">
+                                                    <div class="icon">
+                                                        <?= UseIcon("eye-thin") ?>
+                                                    </div>
+                                                </div>
+
+                                                <div class="icon-button table-button show-component" data-name="add-request">
+                                                    <div class="icon">
+                                                        <?= UseIcon("plus-thin") ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="main-table-body main-table-requests">
+                                        <?= CreateTable($NO_TYPE_TABLE_HEADER_TEXT, $NO_TYPE_TABLE_BODY_KEY, $LOANTYPES, "type_id", $BUTTON) ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="menu-body-item system_type_table" data-category="expense_type">
+                            <div class="data-table-content">
+                                <div class="main-table-container table-component full">
+                                    <div class="main-table-header">
+                                        <div class="table-header">
+                                            <div class="left">
+                                                <div class="title">
+                                                    <h2>Expense Type</h2>
+                                                </div>
+                                            </div>
+                                            <div class="center">
+
+                                            </div>
+                                            <div class="right">
+                                                <div class="icon-button table-button show-component" data-name="delete-request">
+                                                    <div class="icon">
+                                                        <?= UseIcon("trash-thin") ?>
+                                                    </div>
+                                                </div>
+
+                                                <div class="icon-button table-button show-component" data-name="add-request">
+                                                    <div class="icon">
+                                                        <?= UseIcon("plus-thin") ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="main-table-body main-table-requests">
+                                        <?= CreateTable($NO_TYPE_TABLE_HEADER_TEXT, $NO_TYPE_TABLE_BODY_KEY, $EXPENSESTYPES, "type_id", $BUTTON) ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="menu-body-item service_deduction_table" data-category="sss">
+                            <div class="data-table-content">
+                                <div class="main-table-container table-component full">
+                                    <div class="main-table-header">
+                                        <div class="table-header">
+                                            <div class="left">
+                                                <div class="title">
+                                                    <h2>SSS</h2>
+                                                </div>
+                                            </div>
+                                            <div class="center">
+
+                                            </div>
+                                            <div class="right">
+                                                <div class="icon-button table-button show-component" data-name="delete-request">
+                                                    <div class="icon">
+                                                        <?= UseIcon("trash-thin") ?>
+                                                    </div>
+                                                </div>
+
+                                                <div class="icon-button table-button show-component" data-name="add-request">
+                                                    <div class="icon">
+                                                        <?= UseIcon("plus-thin") ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="main-table-body main-table-requests">
+                                        <?= CreateTable($SERVICES_DEDUCTION_TABLE_HEADER_TEXT, $SERVICES_DEDUCTION_TABLE_BODY_KEY, $SSS, "service_deduction_id", $BUTTON) ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="menu-body-item service_deduction_table" data-category="phil">
+                            <div class="data-table-content">
+                                <div class="main-table-container table-component full">
+                                    <div class="main-table-header">
+                                        <div class="table-header">
+                                            <div class="left">
+                                                <div class="title">
+                                                    <h2>Phil-health</h2>
+                                                </div>
+                                            </div>
+                                            <div class="center">
+
+                                            </div>
+                                            <div class="right">
+                                                <div class="icon-button table-button show-component" data-name="delete-request">
+                                                    <div class="icon">
+                                                        <?= UseIcon("trash-thin") ?>
+                                                    </div>
+                                                </div>
+
+                                                <div class="icon-button table-button show-component" data-name="add-request">
+                                                    <div class="icon">
+                                                        <?= UseIcon("plus-thin") ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="main-table-body main-table-requests">
+                                        <?= CreateTable($SERVICES_DEDUCTION_TABLE_HEADER_TEXT, $SERVICES_DEDUCTION_TABLE_BODY_KEY, $PHIL, "service_deduction_id", $BUTTON) ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="menu-body-item service_deduction_table" data-category="pagibig">
+                            <div class="data-table-content">
+                                <div class="main-table-container table-component full">
+                                    <div class="main-table-header">
+                                        <div class="table-header">
+                                            <div class="left">
+                                                <div class="title">
+                                                    <h2>Pag-ibig</h2>
+                                                </div>
+                                            </div>
+                                            <div class="center">
+
+                                            </div>
+                                            <div class="right">
+                                                <div class="icon-button table-button show-component" data-name="delete-request">
+                                                    <div class="icon">
+                                                        <?= UseIcon("trash-thin") ?>
+                                                    </div>
+                                                </div>
+
+                                                <div class="icon-button table-button show-component" data-name="add-request">
+                                                    <div class="icon">
+                                                        <?= UseIcon("plus-thin") ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="main-table-body main-table-requests">
+                                        <?= CreateTable($SERVICES_DEDUCTION_TABLE_HEADER_TEXT, $SERVICES_DEDUCTION_TABLE_BODY_KEY, $PAGIBIG, "service_deduction_id", $BUTTON) ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="menu-body-item service_deduction_table" data-category="year_period_and_month">
+                            <div class="data-table-content">
+                                <div class="main-table-container table-component full">
+                                    <div class="main-table-header">
+                                        <div class="table-header">
+                                            <div class="left">
+                                                <div class="title">
+                                                    <h2>Year, Period and Month</h2>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="main-table-body main-table-requests">
+                                        <form action="" class="form-control year-and-month">
+                                            <div class="form-group-container flex">
+                                                <div class="form-group tooltip">
+                                                    <div class="tooltiptext">
+                                                        <span>Year</span>
+                                                    </div>
+                                                    <div class="error-container">
+                                                        <?= CreateComboBox("year", "Year", GetYearsFrom(1990), false, $profile->year) ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group-container flex">
+                                                <div class="form-group tooltip">
+                                                    <div class="tooltiptext">
+                                                        <span>Period</span>
+                                                    </div>
+                                                    <div class="error-container">
+                                                        <?= CreateComboBox("period", "Period", GetPeriodsOfAYear($profile->year), false, $profile->period) ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group-container submit-group">
+                                                <div class="form-group filled-green">
+                                                    <input type="submit" value="Save">
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="menu-body-item" data-category="database_backup">
+                            <div class="data-table-content">
+                                <div class="main-table-container table-component full">
+                                    <div class="main-table-header">
+                                        <div class="table-header">
+                                            <div class="left">
+                                                <div class="title">
+                                                    <h2>Database Management</h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="main-table-body main-table-requests">
+                                        <div class="backup-containers">
+                                            <div class="backup-container">
+                                                <div class="head">
+                                                    <h2>Backup Database</h2>
+                                                    <p>Backup database right on!</p>
+                                                </div>
+                                                <div class="body">
+                                                    <form action="" class="form-control backup-database">
+                                                        <div class="form-group-container flex">
+                                                            <div class="form-group tooltip">
+                                                                <div class="tooltiptext">
+                                                                    <span>Title</span>
+                                                                </div>
+                                                                <div class="error-container">
+                                                                    <input type="text" name="title" placeholder="Title">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group-container flex">
+                                                            <div class="form-group tooltip">
+                                                                <div class="tooltiptext">
+                                                                    <span>Description</span>
+                                                                </div>
+                                                                <div class="error-container">
+                                                                    <textarea name="description" cols="30"
+                                                                              rows="10" placeholder="Description"></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group-container submit-group">
+                                                            <div class="form-group filled-green">
+                                                                <input type="submit" value="Backup Now">
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <div class="backup-container">
+                                                <div class="head">
+                                                    <h2>Restore Database</h2>
+                                                    <p>Restore database and Apply to system!</p>
+                                                </div>
+                                                <div class="body">
+                                                    <div class="databases-list">
+                                                        <?php foreach ($backupControl->getAllRecords(true) as $record): ?>
+                                                            <div class="db-item">
+                                                                <h3><?= $record->title ?></h3>
+                                                                <p><?= $record->description ?></p>
+                                                                <small><?= $record->date_created ?></small>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <?php include "public/views/pages/structures/html_pipes.phtml" ?>
+
+    <script type="module" src="/public/assets/scripts/pages/main/administrator/settings.js"></script>
+
+    <?php include "public/views/pages/structures/html_closing_parent.phtml" ?>
+
+    <?php include "public/views/pages/structures/html_body_closing.phtml" ?>

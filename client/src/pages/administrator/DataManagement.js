@@ -38,13 +38,10 @@ import {
   Restore as RestoreIcon
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
-import axios from 'axios';
+import { useApi } from '../../contexts/ApiContext';
 import MainLayout from '../../components/layouts/MainLayout';
 
 // Set the base URL for axios
-if (!axios.defaults.baseURL) {
-  axios.defaults.baseURL = 'http://localhost:5000';
-}
 
 // TabPanel component for tab content
 function TabPanel(props) {
@@ -69,6 +66,7 @@ function TabPanel(props) {
 
 const DataManagement = () => {
   const { currentUser } = useAuth();
+  const api = useApi();
   const [tabValue, setTabValue] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -113,11 +111,11 @@ const DataManagement = () => {
         phRes, 
         pagibigRes
       ] = await Promise.all([
-        axios.get('/api/settings/loanTypes'),
-        axios.get('/api/settings/expenseTypes'),
-        axios.get('/api/settings/sss'),
-        axios.get('/api/settings/ph'),
-        axios.get('/api/settings/pagibig')
+        api.get('/api/settings/loanTypes'),
+        api.get('/api/settings/expenseTypes'),
+        api.get('/api/settings/sss'),
+        api.get('/api/settings/ph'),
+        api.get('/api/settings/pagibig')
       ]);
       
       setLoanTypes(loanTypesRes.data);

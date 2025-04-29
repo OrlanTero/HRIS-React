@@ -40,13 +40,10 @@ import {
   BusinessCenter as BusinessIcon
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
-import axios from 'axios';
+import { useApi } from '../../contexts/ApiContext';
 import MainLayout from '../../components/layouts/MainLayout';
 
 // Set the base URL for axios
-if (!axios.defaults.baseURL) {
-  axios.defaults.baseURL = 'http://localhost:5000';
-}
 
 // Format date helper functions
 const formatDateForInput = (date) => {
@@ -73,7 +70,8 @@ const formatDateForDisplay = (dateString) => {
 };
 
 const AssignEmployees = () => {
-  const { token } = useAuth();
+  const { currentUser } = useAuth();
+  const api = useApi();
   const [clients, setClients] = useState([]);
   const [selectedClient, setSelectedClient] = useState(null);
   const [employments, setEmployments] = useState([]);
@@ -96,18 +94,14 @@ const AssignEmployees = () => {
   const [editId, setEditId] = useState(null);
 
   // Configure axios with auth header
-  const authAxios = axios.create({
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  });
+ 
 
   // Load clients on component mount
   useEffect(() => {
-    if (token) {
+    if (currentUser) {
       fetchClients();
     }
-  }, [token]);
+  }, [currentUser]);
 
   // Load deployments when a client is selected
   useEffect(() => {
@@ -120,7 +114,7 @@ const AssignEmployees = () => {
   const fetchClients = async () => {
     setLoading(true);
     try {
-      const response = await authAxios.get('/api/clients');
+      const response = await api.get('/api/clients');
       setClients(response.data);
       if (response.data.length > 0 && !selectedClient) {
         setSelectedClient(response.data[0]);
@@ -137,7 +131,7 @@ const AssignEmployees = () => {
   const fetchDeployments = async (clientId) => {
     setLoading(true);
     try {
-      const response = await authAxios.get(`/api/deployments/client/${clientId}`);
+      const response = await api.get(`/api/deployments/client/${clientId}`);
       setDeployments(response.data);
     } catch (error) {
       console.error(`Error fetching deployments for client ${clientId}:`, error);
@@ -150,7 +144,7 @@ const AssignEmployees = () => {
   // Fetch available employments (not already deployed to selected client)
   const fetchAvailableEmployments = async () => {
     try {
-      const response = await authAxios.get('/api/employments');
+      const response = await api.get('/api/employments');
       setEmployments(response.data);
     } catch (error) {
       console.error('Error fetching employments:', error);
@@ -221,10 +215,10 @@ const AssignEmployees = () => {
   const handleSubmit = async () => {
     try {
       if (isEditing) {
-        await authAxios.put(`/api/deployments/${editId}`, formData);
+        await api.put(`/api/deployments/${editId}`, formData);
         showNotification('Deployment updated successfully');
       } else {
-        await authAxios.post('/api/deployments', formData);
+        await api.post('/api/deployments', formData);
         showNotification('Employee assigned successfully');
       }
       
@@ -244,7 +238,7 @@ const AssignEmployees = () => {
   const handleDeleteDeployment = async (deploymentId) => {
     if (window.confirm('Are you sure you want to remove this employee from the client?')) {
       try {
-        await authAxios.delete(`/api/deployments/${deploymentId}`);
+        await api.delete(`/api/deployments/${deploymentId}`);
         showNotification('Deployment removed successfully');
         
         if (selectedClient) {

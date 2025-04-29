@@ -1,0 +1,301 @@
+#big-pipes-container
+  position: fixed
+  bottom: 0
+//#system-messages
+//#system-notifications
+//#system-popup
+.root-container
+  width: 100%
+  height: 100vh
+  overflow-x: hidden
+
+  .flex-two-container
+    display: flex
+    width: 100%
+    height: 100%
+
+    .left-content
+      width: 250px
+      height: 100%
+
+    .right-content
+      width: calc(100% - 250px)
+      .right-header
+        width: 100%
+        height: 60px
+        background: #ffffff
+        box-shadow: 0 2px 15px rgba(0,0,0,0.05)
+        position: sticky
+        top: 0
+        z-index: 900
+        backdrop-filter: blur(10px)
+        background: rgba(255,255,255,0.95)
+
+        .flex-container
+          display: flex
+          justify-content: space-between
+          align-items: center
+          height: 100%
+          padding: 0 15px
+
+          .left
+            display: flex
+            align-items: center
+            gap: 16px
+
+            .text-image
+              display: flex
+              align-items: center
+              justify-content: center
+              width: 40px
+              height: 40px
+              border-radius: 10px
+              background: linear-gradient(45deg, $color0, darken($color0, 10%))
+              transition: transform 0.3s ease
+
+              img
+                width: 24px
+                height: auto
+                filter: brightness(0) invert(1)
+
+            .text-logo
+              h2
+                color: $textgray
+                font-size: 18px
+                font-weight: 600
+                letter-spacing: -0.3px
+                transition: all 0.3s ease
+                cursor: default
+
+                &:hover
+                  color: darken($textgray, 15%)
+
+          .right
+            padding-right: 15px
+            display: flex
+            align-items: center
+            gap: 10px
+
+            .time-container
+              padding: 8px 16px
+              margin: 0 15px
+              border: 1px solid rgba(0,0,0,0.08)
+              border-radius: 8px
+              background: rgba(255,255,255,0.8)
+              transition: all 0.3s ease
+
+              &:hover
+                background: rgba(255,255,255,1)
+                box-shadow: 0 2px 8px rgba(0,0,0,0.05)
+
+              span
+                color: $textgray
+                font-weight: 500
+                font-size: 14px
+                user-select: none
+
+            .buttons
+              display: flex
+              align-items: center
+              gap: 8px
+
+              .nav-button
+                width: 40px
+                height: 40px
+                border-radius: 10px
+                background: rgba(255,255,255,1)
+                box-shadow: 0 2px 8px rgba(0,0,0,0.05)
+                cursor: pointer
+                display: flex
+                justify-content: center
+                align-items: center
+                position: relative
+                transition: all 0.3s ease
+                border: 1px solid rgba(0,0,0,0.05)
+
+                .content
+                  position: fixed
+                  top: 0
+                  right: 0
+                  width: 0
+                  height: 0
+                  // visibility: hidden
+                  opacity: 0
+                  width: 100px !important
+                  height: 50px !important
+                  background: red !important
+
+                  .absolute-floating-container
+                    width: 200px !important
+                    height: auto !important
+                    max-height: 300px !important
+                    background: red !important
+
+                &:hover
+                  // transform: translateY(-2px)
+                  box-shadow: 0 4px 12px rgba(0,0,0,0.1)
+                  background: $color0
+
+                  .icon.main
+                    svg, img
+                      fill: #fff
+                      transform: scale(1.1)
+
+                &.notif
+                  &::after
+                    content: ''
+                    position: absolute
+                    top: 10px
+                    right: 10px
+                    width: 8px
+                    height: 8px
+                    background: #ef4444
+                    border-radius: 50%
+                    border: 2px solid #fff
+                    display: none
+
+                  &.has-notifications::after
+                    display: block
+                    animation: pulse 2s infinite
+
+                &.profile
+                  padding: 8px
+                  
+                  .icon
+                    position: relative
+                    
+                    img
+                      width: 100%
+                      height: 100%
+                      object-fit: cover
+                      border-radius: 8px
+
+                .icon
+                  width: 24px
+                  height: 24px
+                  display: flex
+                  justify-content: center
+                  align-items: center
+                  transition: all 0.3s ease
+
+                  svg, img
+                    width: 20px
+                    height: auto
+                    fill: $textgray
+                    transition: all 0.3s ease
+
+                
+
+                  // &.show
+                  //   width: auto
+                  //   height: auto
+                  //   visibility: visible
+                  //   opacity: 1
+
+@keyframes pulse
+  0%
+    transform: scale(1)
+    opacity: 1
+  50%
+    transform: scale(1.2)
+    opacity: 0.8
+  100%
+    transform: scale(1)
+    opacity: 1
+
+.main-body-content-parent
+  width: 100%
+  height: calc(100vh - 60px)
+  background: #ebeeee
+  overflow-y: auto
+  .main-body-header
+    padding: 10px
+    .header-nav
+      padding: 20px 40px
+      .left
+        .title
+          position: relative
+          display: flex
+          //justify-content: center
+          align-items: center
+          &:before
+            width: 5px
+            height: 40px
+            background: $color7
+            content: ""
+            position: absolute
+            left: -10px
+
+  .main-body-body
+    padding: 10px
+
+    &.two-flex
+      display: flex
+      flex-wrap: wrap
+      gap: 20px
+      .data-table-selector
+        grid-area: selector
+        margin-left: 20px
+        background: #fff
+        box-shadow: $global_boxshadow
+        border-radius: 15px
+        height: 75vh
+        width: 50%
+        overflow: hidden
+        flex: 1 0 300px
+        .selector-header
+          padding: 10px 20px
+        .selector-body
+          padding: 10px
+          overflow: auto
+          height: 100%
+          width: 100%
+          ul
+            padding: 10px
+            overflow: auto
+
+            li
+              padding: 12px 14px
+              list-style-type: none
+              cursor: pointer
+              user-select: none
+              span
+                font-weight: 600
+              &.active
+                background: $color6
+                span
+                  color: #fff
+              &:hover:not(.active)
+                background: #ebeeee
+
+
+
+      .data-table-content
+        grid-area: grid
+        width: 100%
+        height: 75vh
+        flex: 1 0 600px
+
+        .main-table-container
+          height: 100%
+
+.main-list-list
+  padding: 5px
+  width: 100% !important
+  a
+    text-decoration: none !important
+    color: #050505 !important
+
+  li.item
+    padding: 10px
+    display: flex
+    align-items: center
+    border-radius: 4px
+    margin: 2px
+    text-decoration: none !important
+    color: #050505 !important
+
+    &:hover
+      background: #ebeeee
+
+

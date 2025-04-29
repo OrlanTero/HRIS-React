@@ -1,0 +1,19 @@
+{
+    "name": "orlan/src",
+    "autoload": {
+        "psr-4": {
+            "Orlan\\Src\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "OrlanTero",
+            "email": "104888577+OrlanTero@users.noreply.github.com"
+        }
+    ],
+    "require": {
+        "klein/klein": "^2.1",
+        "phpmailer/phpmailer": "^6.9",
+        "szymach/c-pchart": "^1.1"
+    }
+}
