@@ -53,6 +53,7 @@ import LoanPaymentsPage from './pages/PayrollManager/LoanPaymentsPage';
 import PayrollPage from './pages/PayrollManager/PayrollPage';
 import PayslipDraftDetail from './pages/PayrollManager/PayslipDraftDetail';
 import PayslipPrint from './pages/PayrollManager/PayslipPrint';
+import ReportsPage from './pages/reports/ReportsPage';
 
 // Create a theme
 const theme = createTheme({
@@ -407,7 +408,7 @@ const App = () => {
                 </ProtectedRoute>
               } />
               
-              <Route path="/payroll/draft/:draftId" element={
+              <Route path="/payroll/draft/:id" element={
                 <ProtectedRoute>
                   <MainLayout>
                     <PayslipDraftDetail />
@@ -415,10 +416,17 @@ const App = () => {
                 </ProtectedRoute>
               } />
               
-              <Route path="/payroll/print/:draftId" element={
+              <Route path="/payroll/print/:id" element={
+                <ProtectedRoute>
+                  <PayslipPrint />
+                </ProtectedRoute>
+              } />
+              
+              {/* Reports Pages */}
+              <Route path="/reports" element={
                 <ProtectedRoute>
                   <MainLayout>
-                    <PayslipPrint />
+                    <ReportsPage />
                   </MainLayout>
                 </ProtectedRoute>
               } />

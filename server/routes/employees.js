@@ -271,4 +271,37 @@ router.get('/banks/all', authenticateToken, async (req, res) => {
   }
 });
 
+// Get employees by client ID
+router.get('/client/:clientId', async (req, res) => {
+  try {
+    const { clientId } = req.params;
+    
+    // Verify client exists
+    const [clientCheck] = await pool.query(
+      'SELECT * FROM clients WHERE client_id = ? AND archive_id IS NULL',
+      [clientId]
+    );
+    
+    if (clientCheck.length === 0) {
+      return res.status(404).json({ message: 'Client not found' });
+    }
+    
+    // Get employees for this client using deployed_employees table
+    const [employees] = await pool.query(
+      `SELECT DISTINCT e.*, CONCAT(e.lastname, ', ', e.firstname) as employee_name 
+       FROM employees e
+       JOIN employments emp ON e.employee_id = emp.employee_id
+       JOIN deployed_employees de ON emp.employment_id = de.employment_id
+       WHERE de.client_id = ? AND e.archive_id IS NULL AND de.archive_id IS NULL
+       ORDER BY e.lastname, e.firstname`,
+      [clientId]
+    );
+    
+    res.json(employees);
+  } catch (error) {
+    console.error(`Error fetching employees for client ${req.params.clientId}:`, error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 module.exports = router; 

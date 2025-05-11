@@ -42,7 +42,7 @@ import { useApi } from '../../contexts/ApiContext';
 import { formatCurrency, formatHours, formatDate } from '../../utils/formatters';
 
 const PayslipDraftDetail = () => {
-  const { draftId } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const api = useApi();
@@ -63,14 +63,36 @@ const PayslipDraftDetail = () => {
   const [showFinalizeDialog, setShowFinalizeDialog] = useState(false);
   
   useEffect(() => {
-    fetchDraftDetails();
-  }, [draftId]);
+    setLoading(true);
+    console.log("Draft ID from URL:", id);
+    
+    if (id && id !== "undefined") {
+      fetchDraftDetails();
+    } else {
+      setLoading(false);
+      setError('No payslip draft ID provided. Please go back and select a valid draft.');
+    }
+  }, [id]);
   
   const fetchDraftDetails = async () => {
+    if (!id || id === "undefined") {
+      setLoading(false);
+      setError('No payslip draft ID provided. Please go back and select a valid draft.');
+      return;
+    }
+    
     setLoading(true);
     try {
+      console.log(`Fetching draft with ID: ${id}`);
+      
       // Get draft details
-      const draftResponse = await api.get(`/api/payroll/drafts/${draftId}`);
+      const draftResponse = await api.get(`/api/payroll/drafts/${id}`);
+      
+      if (!draftResponse.data) {
+        setError('Payslip draft not found. Please go back and select a valid draft.');
+        setLoading(false);
+        return;
+      }
       
       setDraft(draftResponse.data);
       
@@ -106,7 +128,7 @@ const PayslipDraftDetail = () => {
       setLoading(false);
     } catch (error) {
       console.error('Error fetching draft details:', error);
-      setError('Failed to load draft details. Please try again.');
+      setError(`Failed to load draft details: ${error.message || 'Unknown error'}`);
       setLoading(false);
     }
   };
@@ -124,7 +146,14 @@ const PayslipDraftDetail = () => {
         pagibig: draft.pagibig,
         cash_advances: draft.cash_advances,
         loan_statement: draft.loan_statement,
-        adjustments: draft.adjustments
+        adjustments: draft.adjustments,
+        regular_hours: draft.regular_hours || 0,
+        ot_hours: draft.ot_hours || 0,
+        night_diff_hours: draft.night_diff_hours || 0,
+        special_holiday_hours: draft.special_holiday_hours || 0,
+        legal_holiday_hours: draft.legal_holiday_hours || 0,
+        total_hours: draft.total_hours || 0,
+        ndw: draft.ndw || 0
       });
     }
     
@@ -149,6 +178,15 @@ const PayslipDraftDetail = () => {
     const cashAdvances = parseFloat(editedValues.cash_advances || draft.cash_advances);
     const loanStatement = parseFloat(editedValues.loan_statement || draft.loan_statement);
     const adjustments = parseFloat(editedValues.adjustments || draft.adjustments);
+    
+    // Get the hours values
+    const regularHours = parseFloat(editedValues.regular_hours || draft.regular_hours || 0);
+    const otHours = parseFloat(editedValues.ot_hours || draft.ot_hours || 0);
+    const nightDiffHours = parseFloat(editedValues.night_diff_hours || draft.night_diff_hours || 0);
+    const specialHolidayHours = parseFloat(editedValues.special_holiday_hours || draft.special_holiday_hours || 0);
+    const legalHolidayHours = parseFloat(editedValues.legal_holiday_hours || draft.legal_holiday_hours || 0);
+    const totalHours = regularHours + otHours + nightDiffHours + specialHolidayHours + legalHolidayHours;
+    const daysWorked = parseFloat(editedValues.ndw || draft.ndw || 0);
     
     // Calculate the updated gross pay
     const originalGrossPay = parseFloat(draft.gross_pay);
@@ -176,7 +214,14 @@ const PayslipDraftDetail = () => {
       netpay,
       cash_advances: cashAdvances,
       loan_statement: loanStatement,
-      adjustments
+      adjustments,
+      regular_hours: regularHours,
+      ot_hours: otHours,
+      night_diff_hours: nightDiffHours,
+      special_holiday_hours: specialHolidayHours,
+      legal_holiday_hours: legalHolidayHours,
+      total_hours: totalHours,
+      ndw: daysWorked
     };
   };
   
@@ -187,7 +232,7 @@ const PayslipDraftDetail = () => {
       const updatedValues = calculateUpdatedNetpay();
       
       await api.put(
-        `/api/payroll/drafts/${draftId}`,
+        `/api/payroll/drafts/${id}`,
         updatedValues
       );
       
@@ -210,17 +255,15 @@ const PayslipDraftDetail = () => {
     try {
       await api.post(
         '/api/payroll/finalize',
-        { drafts: [draftId] }
+        { drafts: [id] }
       );
       
       setSuccessMessage('Payslip finalized successfully');
       setSaving(false);
       setShowFinalizeDialog(false);
       
-      // Navigate back to payroll after a short delay
-      setTimeout(() => {
-        navigate('/payroll');
-      }, 1500);
+      // Stay on this page after finalizing instead of navigating away
+      fetchDraftDetails();
     } catch (error) {
       console.error('Error finalizing draft:', error);
       setError('Failed to finalize draft. Please try again.');
@@ -243,21 +286,21 @@ const PayslipDraftDetail = () => {
     );
   }
   
-  if (!draft) {
+  if (!draft && !loading) {
     return (
       <Container maxWidth="lg">
         <Box sx={{ pt: 3, pb: 2 }}>
-          <Alert severity="error">
-            Draft not found. It may have been deleted or finalized.
-          </Alert>
-          <Button
-            variant="outlined"
-            startIcon={<ArrowBackIcon />}
+          <Button 
+            variant="outlined" 
+            startIcon={<ArrowBackIcon />} 
             onClick={handleGoBack}
-            sx={{ mt: 2 }}
+            sx={{ mb: 2 }}
           >
             Back to Payroll
           </Button>
+          <Alert severity="error">
+            {error || "Payslip draft not found. Please go back and select a valid draft."}
+          </Alert>
         </Box>
       </Container>
     );
@@ -385,33 +428,110 @@ const PayslipDraftDetail = () => {
                   <Grid item xs={12}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                       <Typography>Regular Hours:</Typography>
-                      <Typography>{formatHours(draft.regular_hours)}</Typography>
+                      {isEditing ? (
+                        <TextField
+                          type="number"
+                          size="small"
+                          value={editedValues.regular_hours}
+                          onChange={(e) => handleChange('regular_hours', e.target.value)}
+                          InputProps={{ inputProps: { min: 0, step: 0.01 } }}
+                          sx={{ width: '150px' }}
+                        />
+                      ) : (
+                        <Typography>{formatHours(draft.regular_hours)}</Typography>
+                      )}
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                       <Typography>Overtime Hours:</Typography>
-                      <Typography>{formatHours(draft.ot_hours)}</Typography>
+                      {isEditing ? (
+                        <TextField
+                          type="number"
+                          size="small"
+                          value={editedValues.ot_hours}
+                          onChange={(e) => handleChange('ot_hours', e.target.value)}
+                          InputProps={{ inputProps: { min: 0, step: 0.01 } }}
+                          sx={{ width: '150px' }}
+                        />
+                      ) : (
+                        <Typography>{formatHours(draft.ot_hours)}</Typography>
+                      )}
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                       <Typography>Night Diff Hours:</Typography>
-                      <Typography>{formatHours(draft.night_diff_hours)}</Typography>
+                      {isEditing ? (
+                        <TextField
+                          type="number"
+                          size="small"
+                          value={editedValues.night_diff_hours}
+                          onChange={(e) => handleChange('night_diff_hours', e.target.value)}
+                          InputProps={{ inputProps: { min: 0, step: 0.01 } }}
+                          sx={{ width: '150px' }}
+                        />
+                      ) : (
+                        <Typography>{formatHours(draft.night_diff_hours)}</Typography>
+                      )}
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                       <Typography>Special Holiday Hours:</Typography>
-                      <Typography>{formatHours(draft.special_holiday_hours)}</Typography>
+                      {isEditing ? (
+                        <TextField
+                          type="number"
+                          size="small"
+                          value={editedValues.special_holiday_hours}
+                          onChange={(e) => handleChange('special_holiday_hours', e.target.value)}
+                          InputProps={{ inputProps: { min: 0, step: 0.01 } }}
+                          sx={{ width: '150px' }}
+                        />
+                      ) : (
+                        <Typography>{formatHours(draft.special_holiday_hours)}</Typography>
+                      )}
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                       <Typography>Legal Holiday Hours:</Typography>
-                      <Typography>{formatHours(draft.legal_holiday_hours)}</Typography>
+                      {isEditing ? (
+                        <TextField
+                          type="number"
+                          size="small"
+                          value={editedValues.legal_holiday_hours}
+                          onChange={(e) => handleChange('legal_holiday_hours', e.target.value)}
+                          InputProps={{ inputProps: { min: 0, step: 0.01 } }}
+                          sx={{ width: '150px' }}
+                        />
+                      ) : (
+                        <Typography>{formatHours(draft.legal_holiday_hours)}</Typography>
+                      )}
                     </Box>
                     <Divider sx={{ my: 1 }} />
                     
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                       <Typography>Days Worked:</Typography>
-                      <Typography>{draft.ndw}</Typography>
+                      {isEditing ? (
+                        <TextField
+                          type="number"
+                          size="small"
+                          value={editedValues.ndw}
+                          onChange={(e) => handleChange('ndw', e.target.value)}
+                          InputProps={{ inputProps: { min: 0, step: 1 } }}
+                          sx={{ width: '150px' }}
+                        />
+                      ) : (
+                        <Typography>{draft.ndw}</Typography>
+                      )}
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                       <Typography>Total Hours:</Typography>
-                      <Typography>{formatHours(draft.total_hours)}</Typography>
+                      <Typography>
+                        {isEditing 
+                          ? formatHours(
+                              parseFloat(editedValues.regular_hours || 0) +
+                              parseFloat(editedValues.ot_hours || 0) +
+                              parseFloat(editedValues.night_diff_hours || 0) +
+                              parseFloat(editedValues.special_holiday_hours || 0) +
+                              parseFloat(editedValues.legal_holiday_hours || 0)
+                            )
+                          : formatHours(draft.total_hours)
+                        }
+                      </Typography>
                     </Box>
                     <Divider sx={{ my: 1 }} />
                     

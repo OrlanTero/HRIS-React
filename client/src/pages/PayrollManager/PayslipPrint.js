@@ -27,7 +27,7 @@ import { formatCurrency, formatHours, formatDate } from '../../utils/formatters'
 import { useReactToPrint } from 'react-to-print';
 
 const PayslipPrint = () => {
-  const { draftId } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const api = useApi();
@@ -43,14 +43,37 @@ const PayslipPrint = () => {
   const [rates, setRates] = useState(null);
   
   useEffect(() => {
-    fetchDraftDetails();
-  }, [draftId]);
+    setLoading(true);
+    console.log("Draft ID from URL (Print):", id);
+    
+    if (id && id !== "undefined") {
+      fetchDraftDetails();
+    } else {
+      setLoading(false);
+      setError('No payslip draft ID provided. Please go back and select a valid draft.');
+    }
+  }, [id]);
   
   const fetchDraftDetails = async () => {
+    if (!id || id === "undefined") {
+      setLoading(false);
+      setError('No payslip draft ID provided. Please go back and select a valid draft.');
+      return;
+    }
+    
     setLoading(true);
     try {
+      console.log(`Fetching draft with ID (Print): ${id}`);
+      
       // Get draft details
-      const draftResponse = await api.get(`/api/payroll/drafts/${draftId}`);
+      const draftResponse = await api.get(`/api/payroll/drafts/${id}`);
+      
+      if (!draftResponse.data) {
+        setError('Payslip draft not found. Please go back and select a valid draft.');
+        setLoading(false);
+        return;
+      }
+      
       setDraft(draftResponse.data);
       
       // Get employee details
@@ -82,7 +105,7 @@ const PayslipPrint = () => {
       setLoading(false);
     } catch (error) {
       console.error('Error fetching draft details:', error);
-      setError('Failed to load draft details. Please try again.');
+      setError(`Failed to load draft details: ${error.message || 'Unknown error'}`);
       setLoading(false);
     }
   };
@@ -106,21 +129,21 @@ const PayslipPrint = () => {
     );
   }
   
-  if (!draft) {
+  if (!draft && !loading) {
     return (
       <Container maxWidth="lg">
         <Box sx={{ pt: 3, pb: 2 }}>
-          <Alert severity="error">
-            Draft not found. It may have been deleted or finalized.
-          </Alert>
           <Button
             variant="outlined"
             startIcon={<ArrowBackIcon />}
             onClick={handleGoBack}
-            sx={{ mt: 2 }}
+            sx={{ mb: 2 }}
           >
             Back to Payroll
           </Button>
+          <Alert severity="error">
+            {error || "Payslip draft not found. Please go back and select a valid draft."}
+          </Alert>
         </Box>
       </Container>
     );

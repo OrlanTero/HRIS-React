@@ -152,7 +152,7 @@ class PayrollAnalyzer {
       let loanStatements = [];
       try {
         [loanStatements] = await pool.query(
-          `SELECT ls.*, l.loan_type, l.description 
+          `SELECT ls.*, l.loan_type, l.description, l.advance
            FROM loan_statements ls
            JOIN loans l ON ls.loan_id = l.loan_id
            WHERE ls.employee_id = ? AND ls.status = 0 AND ls.db_status = 1
@@ -164,9 +164,38 @@ class PayrollAnalyzer {
         // Continue with empty array
       }
 
+      // Process loan statements based on type
+      const advanceLoans = {};
+      const regularLoans = [];
+      
+      // Separate loans into advance and regular
+      for (const statement of loanStatements) {
+        if (statement.advance === 1) {
+          // Group advance loans by loan_id
+          if (!advanceLoans[statement.loan_id]) {
+            advanceLoans[statement.loan_id] = [];
+          }
+          advanceLoans[statement.loan_id].push(statement);
+        } else {
+          regularLoans.push(statement);
+        }
+      }
+      
+      // For advance loans, only use the current term (first pending statement)
+      let processedStatements = regularLoans;
+      
+      for (const loanId in advanceLoans) {
+        // Sort by num (term number)
+        const statements = advanceLoans[loanId].sort((a, b) => a.num - b.num);
+        if (statements.length > 0) {
+          // Only add the first pending statement (current term)
+          processedStatements.push(statements[0]);
+        }
+      }
+
       // Get separate loans (group by loan_id)
       const separateLoans = {};
-      for (const statement of loanStatements) {
+      for (const statement of processedStatements) {
         if (!separateLoans[statement.loan_id]) {
           separateLoans[statement.loan_id] = statement;
         }
@@ -178,8 +207,8 @@ class PayrollAnalyzer {
         .filter(desc => desc)
         .join(',');
 
-      // Calculate total loan balance - safely handle null/undefined
-      const totalLoanBalance = loanStatements.reduce((sum, statement) => {
+      // Calculate total loan balance based on processed statements
+      const totalLoanBalance = processedStatements.reduce((sum, statement) => {
         return sum + parseFloat(statement.balance || 0);
       }, 0);
 
@@ -249,7 +278,8 @@ class PayrollAnalyzer {
         totalAdjustments,
         totalLoanBalance,
         beneficiaries,
-        loanDescriptions
+        loanDescriptions,
+        processedStatements
       );
 
       return computation;
@@ -411,8 +441,53 @@ class PayrollAnalyzer {
     totalAdjustments, 
     totalLoanBalance, 
     beneficiaries, 
-    loanPurpose
+    loanPurpose,
+    loanStatements = []
   ) {
+    // Prepare loan details
+    const loanDetailsMap = {};
+    
+    // Group statements by loan_id to count total terms
+    loanStatements.forEach(statement => {
+      const loanId = statement.loan_id;
+      if (!loanDetailsMap[loanId]) {
+        loanDetailsMap[loanId] = {
+          statements: [],
+          loan_id: loanId,
+          description: statement.description,
+          advance: statement.advance
+        };
+      }
+      loanDetailsMap[loanId].statements.push(statement);
+    });
+    
+    // Process loan details
+    const loanDetails = Object.values(loanDetailsMap).map(loan => {
+      // Sort statements by num
+      const sortedStatements = loan.statements.sort((a, b) => a.num - b.num);
+      const firstStatement = sortedStatements[0];
+      
+      // For advanced loans, find the current term and total terms
+      let current_term = 1;
+      let total_terms = sortedStatements.length;
+      let term_amount = 0;
+      
+      if (loan.advance === 1 && firstStatement) {
+        current_term = firstStatement.num;
+        term_amount = parseFloat(firstStatement.balance || 0);
+      }
+      
+      return {
+        loan_id: loan.loan_id,
+        description: loan.description,
+        advance: loan.advance,
+        current_term: current_term,
+        total_terms: total_terms,
+        term_amount: term_amount,
+        balance: parseFloat(firstStatement ? firstStatement.balance : 0)
+      };
+    });
+    
     // Create the payroll computation object with all calculated values
     const computation = {
       // Employee info
@@ -478,6 +553,9 @@ class PayrollAnalyzer {
       adjustments: totalAdjustments,
       loan_statement: totalLoanBalance,
       loan_purpose: loanPurpose,
+      
+      // Loan details
+      loan_details: loanDetails,
       
       // Beneficiaries
       beneficiaries: beneficiaries.map(b => b.beneficiary_id).join(','),

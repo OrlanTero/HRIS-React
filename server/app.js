@@ -144,6 +144,14 @@ app.get('/api/user/profile', authenticateToken, async (req, res) => {
 
 // Authentication middleware
 function authenticateToken(req, res, next) {
+  // Skip authentication for the test endpoint and specific public endpoints
+  if (req.path === '/api/test' || 
+      req.path === '/years' || 
+      req.path.startsWith('/periods/') ||
+      req.path.startsWith('/reports/')) {
+    return next();
+  }
+  
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
   
@@ -170,7 +178,7 @@ app.use('/api/clients', clientRoutes);
 app.use('/api/holidays', holidayRoutes);
 app.use('/api/client-holidays', clientHolidayRoutes);
 app.use('/api/employments', employmentRoutes);
-app.use('/api/deployments', deployedEmployeeRoutes);
+app.use('/api/deployed-employees', deployedEmployeeRoutes);
 app.use('/api/mortuaries', mortuaryRoutes);
 app.use('/api/beneficiaries', beneficiaryRoutes);
 app.use('/api/mortuary-payments', mortuaryPaymentRoutes);
@@ -178,7 +186,7 @@ app.use('/api/attendance', attendanceRoutes);
 app.use('/api/attendance-groups', attendanceGroupsRoutes);
 app.use('/api/attendanceGroups', attendanceGroupsRoutes);
 app.use('/api/adjustments', adjustmentsRoutes);
-app.use('/api/pettyCash', pettyCashRoutes);
+app.use('/api/pettycash', pettyCashRoutes);
 app.use('/api/requisitions', requisitionsRoutes);
 app.use('/api/disbursements', disbursementsRoutes);
 app.use('/api/loans', loanRoutes);
@@ -186,6 +194,10 @@ app.use('/api/loan-payments', loanPaymentRoutes);
 app.use('/api/loan-statements', loanStatementRoutes);
 app.use('/api/payroll', payrollRoutes);
 app.use('/api/settings', settingsRoutes);
+
+// Map reports routes to payroll routes
+app.use('/api/reports', payrollRoutes);
+app.use('/api/public/reports', payrollRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

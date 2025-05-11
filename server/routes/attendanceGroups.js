@@ -130,7 +130,7 @@ router.get('/client/:clientId/latest', authenticateToken, async (req, res) => {
 });
 
 // Get attendance periods by year
-router.get('/periods/:year', authenticateToken, async (req, res) => {
+router.get('/periods/:year', async (req, res) => {
   try {
     const { year } = req.params;
     const query = `
@@ -152,8 +152,31 @@ router.get('/periods/:year', authenticateToken, async (req, res) => {
   }
 });
 
-// Get years with attendance records
-router.get('/years', authenticateToken, async (req, res) => {
+// Get attendance periods by year (public endpoint)
+router.get('/public/periods/:year', async (req, res) => {
+  try {
+    const { year } = req.params;
+    const query = `
+      SELECT DISTINCT period 
+      FROM attendance_groups 
+      WHERE year = ? AND archive_id IS NULL
+      ORDER BY date_created DESC
+    `;
+    
+    const [rows] = await pool.query(query, [year]);
+    
+    // Extract just the period values
+    const periods = rows.map(row => row.period);
+    
+    res.json(periods);
+  } catch (error) {
+    console.error('Error fetching attendance periods:', error);
+    res.status(500).json({ message: 'Error fetching attendance periods', error: error.message });
+  }
+});
+
+// Get years with attendance records (public endpoint)
+router.get('/public/years', async (req, res) => {
   try {
     const query = `
       SELECT DISTINCT year 
@@ -165,14 +188,21 @@ router.get('/years', authenticateToken, async (req, res) => {
     const [rows] = await pool.query(query);
     
     // Extract just the year values
-    const years = rows.map(row => row.year);
+    const years = rows.map(row => row.year.toString());
     
-    // If no years are found, return an empty array instead of a 404
-    res.json(years || []);
+    // If no years are found, return current and previous year
+    if (years.length === 0) {
+      const currentYear = new Date().getFullYear();
+      years.push(currentYear.toString(), (currentYear - 1).toString());
+    }
+    
+    // Always return a 200 status with the years array
+    res.json(years);
   } catch (error) {
     console.error('Error fetching attendance years:', error);
-    // Return an empty array with status 200 instead of 500 to prevent client errors
-    res.json([]);
+    // Return current and previous year with status 200 instead of 500 to prevent client errors
+    const currentYear = new Date().getFullYear();
+    res.json([currentYear.toString(), (currentYear - 1).toString()]);
   }
 });
 

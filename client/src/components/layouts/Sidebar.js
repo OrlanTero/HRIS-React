@@ -41,7 +41,8 @@ import {
   ToggleOff as ToggleLeftIcon,
   ToggleOn as ToggleRightIcon,
   AttachMoney as AttachMoneyIcon,
-  Wallet as WalletIcon
+  Wallet as WalletIcon,
+  Assessment as AssessmentIcon
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -123,6 +124,11 @@ const navLinks = [
         text: "Payroll", 
         path: "/payroll", 
         icon: <MoneyIcon />
+      },
+      { 
+        text: "Reports", 
+        path: "/reports", 
+        icon: <AssessmentIcon />
       },
       { 
         text: "Loan Manager", 

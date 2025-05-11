@@ -491,4 +491,31 @@ router.post('/database/backup', async (req, res) => {
   }
 });
 
+// Get system types by category
+router.get('/types/:category', async (req, res) => {
+  const { category } = req.params;
+  
+  if (!category) {
+    return res.status(400).json({ error: 'Category parameter is required' });
+  }
+  
+  const query = `
+    SELECT type_id as id, type as name, category, affects_in, affects_value, date_created as created_at 
+    FROM system_types 
+    WHERE category = ?
+    ORDER BY type
+  `;
+  
+  try {
+    const [results] = await pool.query(query, [category]);
+    res.json(results);
+  } catch (error) {
+    console.error(`Error fetching ${category} types:`, error);
+    return res.status(500).json({ 
+      error: `Failed to fetch ${category} types`, 
+      details: error.message 
+    });
+  }
+});
+
 module.exports = router; 
