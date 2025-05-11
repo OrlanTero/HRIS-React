@@ -194,7 +194,7 @@ router.post('/batch', authenticateToken, async (req, res) => {
         } = record;
         
         // Validate required fields based on action
-        if (!attendance_group_id || !employee_id || !type || !day) {
+        if (!attendance_group_id || !employee_id || type === undefined || type === null || !day) {
           results.push({ 
             success: false, 
             record, 
@@ -341,7 +341,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
     } = req.body;
 
     // Validate required fields
-    if (!attendance_group_id || !employee_id || !type || !day) {
+    if (!attendance_group_id || !employee_id || type === undefined || type === null || !day) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 

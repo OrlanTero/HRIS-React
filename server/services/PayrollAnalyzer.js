@@ -87,20 +87,25 @@ class PayrollAnalyzer {
             position: record.position || ''  // Use empty string as default
           },
           attendance: [],
-          ndw: 0 // Number of days worked
+          ndw: 0, // Number of days worked
+          daysWorked: new Set() // Track unique days worked
         };
       }
 
       groupedAttendances[record.employee_id].attendance.push(record);
 
-      // Count days worked (for regular attendance only)
-      if (parseInt(record.type) === ATTENDANCE_TYPES.REGULAR) {
-        const hours = parseFloat(record.hours);
-        if (hours > 0) {
-          groupedAttendances[record.employee_id].ndw += 1;
-        }
+      // Track any day with hours > 0 as a working day, regardless of type
+      const hours = parseFloat(record.hours || 0);
+      if (hours > 0) {
+        groupedAttendances[record.employee_id].daysWorked.add(parseInt(record.day));
       }
     }
+
+    // Calculate ndw from the unique days worked
+    Object.values(groupedAttendances).forEach(employeeData => {
+      employeeData.ndw = employeeData.daysWorked.size;
+      delete employeeData.daysWorked; // Remove the temporary set
+    });
 
     return Object.values(groupedAttendances);
   }
@@ -425,7 +430,7 @@ class PayrollAnalyzer {
       special_holiday_ot_hours: hours[ATTENDANCE_TYPES.SPECIAL_HOLIDAY_OT],
       legal_holiday_hours: hours[ATTENDANCE_TYPES.LEGAL_HOLIDAY],
       legal_holiday_ot_hours: hours[ATTENDANCE_TYPES.LEGAL_HOLIDAY_OT],
-      total_hours: hours[ATTENDANCE_TYPES.REGULAR] + hours[ATTENDANCE_TYPES.OT],
+      total_hours: Object.values(hours).reduce((sum, value) => sum + value, 0),
       
       // Work metrics
       ndw: ndw,
