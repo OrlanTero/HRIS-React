@@ -282,10 +282,13 @@ const ReportsPage = () => {
         `/api/payroll/public/reports/account-credited/client/${selectedClient}/period/${encodeURIComponent(selectedPeriod)}/year/${selectedYear}`
       );
       
+      // Extract the data array from the response
+      const dataArray = response.data?.data || [];
+      
       // Filter by bank if a specific bank is selected
-      let filteredData = response.data;
+      let filteredData = dataArray;
       if (selectedBank !== 'all') {
-        filteredData = response.data.filter(item => item.bank_id === selectedBank);
+        filteredData = dataArray.filter(item => item.bank_id === selectedBank);
       }
       
       setAccountCreditedData(filteredData);
@@ -414,8 +417,8 @@ const ReportsPage = () => {
     // Check if draft and draft ID exist before navigating
     if (draft && draft.payslip_draft_id && draft.payslip_draft_id !== undefined) {
       console.log("Navigating to draft:", draft.payslip_draft_id);
-      // Navigate to payslip view
-      navigate(`/payroll/draft/${draft.payslip_draft_id}`);
+    // Navigate to payslip view
+    navigate(`/payroll/draft/${draft.payslip_draft_id}`);
     } else {
       console.error("Invalid draft object or missing ID:", draft);
       setError('Cannot view this payslip draft. Draft ID is missing or invalid.');
@@ -427,7 +430,7 @@ const ReportsPage = () => {
     if (draft && draft.payslip_draft_id && draft.payslip_draft_id !== undefined) {
       console.log("Navigating to print draft:", draft.payslip_draft_id);
       // Navigate to payslip view instead of print
-      navigate(`/payroll/print/${draft.payslip_draft_id}`);
+    navigate(`/payroll/print/${draft.payslip_draft_id}`);
     } else {
       console.error("Invalid draft object or missing ID for print:", draft);
       setError('Cannot print this payslip draft. Draft ID is missing or invalid.');
@@ -1063,9 +1066,9 @@ const ReportsPage = () => {
       
       {/* Date Filters */}
       <Paper sx={{ p: 2, mb: 3 }}>
-        <Typography variant="h6" gutterBottom>
+          <Typography variant="h6" gutterBottom>
           Date Filters
-        </Typography>
+          </Typography>
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} md={4}>
             <TextField
@@ -1774,7 +1777,7 @@ const ReportsPage = () => {
                       <TableCell>{item.employee_name}</TableCell>
                       <TableCell>{item.bank_name}</TableCell>
                       <TableCell>{item.account_number}</TableCell>
-                      <TableCell align="right">{formatCurrency(item.amount)}</TableCell>
+                      <TableCell align="right">{formatCurrency(item.net_pay)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

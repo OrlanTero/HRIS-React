@@ -362,7 +362,7 @@ router.get('/drafts/:id', authenticateToken, async (req, res) => {
     const query = `
       SELECT pd.*,
              CONCAT(e.firstname, ' ', e.lastname) as employee_name,
-             e.firstname, e.lastname, e.tin_number, e.position, e.rate, e.employee_id,
+             e.firstname, e.lastname, e.rate, e.employee_id,
              c.name as client_name, c.client_id,
              pr.regular, pr.overtime, pr.night_diff, pr.special_holiday, 
              pr.special_holiday_ot, pr.legal_holiday, pr.legal_holiday_ot,
@@ -370,6 +370,7 @@ router.get('/drafts/:id', authenticateToken, async (req, res) => {
              pr.sea, pr.ctpa, pr.cola, pr.leave_rate
       FROM payslip_drafts pd
       JOIN employees e ON pd.employee_id = e.employee_id
+      LEFT JOIN employments em ON e.employee_id = em.employee_id
       LEFT JOIN clients c ON pd.client_id = c.client_id
       LEFT JOIN payslip_rates pr ON pd.payslip_rates_id = pr.rate_id
       WHERE pd.payslip_draft_id = ? AND pd.archive_id IS NULL
@@ -882,9 +883,10 @@ router.get('/public/reports/account-credited/client/:clientId/period/:period/yea
     const payslipsQuery = `
       SELECT p.*, 
              CONCAT(e.firstname, ' ', e.lastname) as employee_name,
-             e.firstname, e.lastname, e.position, e.tin_number, e.employee_id
+             e.firstname, e.lastname, em.position, e.employee_id
       FROM payslips p
       JOIN employees e ON p.employee_id = e.employee_id
+      LEFT JOIN employments em ON e.employee_id = em.employee_id
       WHERE p.client_id = ? AND p.period = ? AND p.year = ? AND p.archive_id IS NULL
       ORDER BY e.lastname, e.firstname
     `;
@@ -898,7 +900,7 @@ router.get('/public/reports/account-credited/client/:clientId/period/:period/yea
     // Get bank accounts for these employees
     const employeeIds = payslips.map(p => p.employee_id);
     const bankAccountsQuery = `
-      SELECT ba.*, b.name as bank_name, b.bank_id, b.swift_code, b.branch,
+      SELECT ba.*, b.name as bank_name, b.bank_id,
              ba.employee_id, ba.is_primary
       FROM bank_accounts ba
       LEFT JOIN banks b ON ba.bank_id = b.bank_id
@@ -921,8 +923,6 @@ router.get('/public/reports/account-credited/client/:clientId/period/:period/yea
           account_number: acct.account_number || 'N/A',
           account_name: acct.account_name || 'N/A',
           bank_id: acct.bank_id,
-          swift_code: acct.swift_code,
-          branch: acct.branch,
           is_primary: acct.is_primary
         };
       }
@@ -946,8 +946,6 @@ router.get('/public/reports/account-credited/client/:clientId/period/:period/yea
         account_number: 'N/A',
         account_name: 'N/A',
         bank_id: null,
-        swift_code: 'N/A',
-        branch: 'N/A',
         is_primary: 0
       };
       
@@ -957,13 +955,10 @@ router.get('/public/reports/account-credited/client/:clientId/period/:period/yea
         firstname: payslip.firstname,
         lastname: payslip.lastname,
         position: payslip.position,
-        tin_number: payslip.tin_number,
         bank_name: bankInfo.bank_name,
         bank_id: bankInfo.bank_id,
         account_number: bankInfo.account_number,
         account_name: bankInfo.account_name,
-        swift_code: bankInfo.swift_code,
-        branch: bankInfo.branch,
         is_primary_account: bankInfo.is_primary === 1,
         net_pay: parseFloat(payslip.netpay || 0),
         credit_date: currentDate, // Using current date as credit date
@@ -1293,6 +1288,27 @@ router.get('/public/preview/client/:clientId/period/:period/year/:year', async (
           analyzer.group.ctpa = clientCheck[0].ctpa || 0;
           analyzer.group.legal_holiday = clientCheck[0].legal_holiday || 0;
           analyzer.group.legal_holiday_ot = clientCheck[0].legal_holiday_ot || 0;
+          
+          // Set default 8 hours per day for 15 days if no attendance data
+          for (const employeeId of employeeIds) {
+            // Create attendance entries for regular hours
+            for (let day = 1; day <= 15; day++) {
+              await connection.query(
+                `INSERT INTO attendance (
+                  attendance_group_id, employee_id, type, day, hours, db_status, date_created
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                [
+                  attendanceGroupId,
+                  employeeId,
+                  'regular',
+                  day,
+                  8, // 8 hours per day
+                  1, // db_status
+                  new Date()
+                ]
+              );
+            }
+          }
         }
         
         // Compute payroll for all employees
@@ -1485,6 +1501,27 @@ router.get('/public/preview/client/:clientId/period/:period/year/:year/az', asyn
           analyzer.group.ctpa = clientCheck[0].ctpa || 0;
           analyzer.group.legal_holiday = clientCheck[0].legal_holiday || 0;
           analyzer.group.legal_holiday_ot = clientCheck[0].legal_holiday_ot || 0;
+          
+          // Set default 8 hours per day for 15 days if no attendance data
+          for (const employeeId of employeeIds) {
+            // Create attendance entries for regular hours
+            for (let day = 1; day <= 15; day++) {
+              await connection.query(
+                `INSERT INTO attendance (
+                  attendance_group_id, employee_id, type, day, hours, db_status, date_created
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                [
+                  attendanceGroupId,
+                  employeeId,
+                  'regular',
+                  day,
+                  8, // 8 hours per day
+                  1, // db_status
+                  new Date()
+                ]
+              );
+            }
+          }
         }
         
         // Compute payroll for all employees
